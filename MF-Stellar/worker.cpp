@@ -41,7 +41,7 @@ using namespace std;
 #define COL_RS 64
 #define ThreshIter 1000
 #define WORKER_THREAD_NUM 4
-#define WORKER_NUM 1
+int WORKER_NUM = 1;
 
 /**Yahoo!Music**/
 double yita = 0.001;
@@ -158,10 +158,16 @@ int main(int argc, const char * argv[])
         remote_ports[i] = 10000 + i;
     }
     int thresh_log = 1200;
-    thread_id = atoi(argv[1]);
+
+    if (argc >= 2)
+    {
+        thread_id = atoi(argv[1]);
+    }
+
     if (argc >= 3)
     {
-        thresh_log = atoi(argv[2]);
+        WORKER_NUM = atoi(argv[2]);
+
     }
 
     int row_unit = ROW_PS / WORKER_NUM;
