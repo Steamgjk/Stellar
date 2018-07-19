@@ -279,6 +279,7 @@ int main(int argc, const char * argv[])
 
 void LoadData()
 {
+    /*
     for (int i = 0; i < 100; i ++)
     {
         for (int j = 0; j < 100; j++)
@@ -286,6 +287,7 @@ void LoadData()
             entry_vec[i][j].clear();
         }
     }
+    **/
     char fn[100];
     int user_id, movie_id;
     float rate;
