@@ -59,8 +59,8 @@ using namespace std;
 **/
 /**Yahoo!Music **/
 
-#define FILE_NAME "./trainDS/"
-#define TEST_NAME "./validationDS"
+#define FILE_NAME "/home/shuai/oneword/trainDS/"
+#define TEST_NAME "/home/shuai/oneword/validationDS"
 #define N 1000990
 #define M 624961
 #define K  100 //主题个数

@@ -31,7 +31,7 @@
 using namespace std;
 
 
-#define FILE_NAME "./trainDS/"
+#define FILE_NAME "/home/shuai/oneword/trainDS/"
 #define TEST_NAME "./yahoo-output/test"
 #define N 1000990
 #define M 624961
