@@ -167,13 +167,13 @@ int main(int argc, const char * argv[])
     if (argc >= 3)
     {
         WORKER_NUM = atoi(argv[2]);
-
     }
 
     int row_unit = ROW_PS / WORKER_NUM;
     for (int i = 0; i < WORKER_NUM; i++)
     {
         row_lens[i] = i * row_unit;
+        printf("row_lens[%d]=%d\n", i, row_lens[i] );
     }
     row_lens[WORKER_NUM] = ROW_PS;
     int col_unit = COL_RS / WORKER_NUM;
