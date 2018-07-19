@@ -562,12 +562,12 @@ void recvTd(int recv_thread_id)
             Qblocks[block_idx].eles[i] = data_eles[i];
         }
 
-        printf("successful rece another Block\n");
+        //printf("[]successful rece another Block\n");
         free(sockBuf);
         free(dataBuf);
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        printf("recv success time = %lld\n", mksp );
+        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
         recvCount++;
     }
 }

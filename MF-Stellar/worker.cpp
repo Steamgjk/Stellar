@@ -170,7 +170,7 @@ int main(int argc, const char * argv[])
     }
 
     int row_unit = ROW_PS / WORKER_NUM;
-    for (int i = 0; i < WORKER_NUM; i++)
+    for (int i = 0; i < LoadData WORKER_NUM; i++)
     {
         row_lens[i] = i * row_unit;
         printf("row_lens[%d]=%d\n", i, row_lens[i] );
@@ -251,7 +251,7 @@ int main(int argc, const char * argv[])
                 calcTimes[iter_cnt / 10] = calc_time;
                 loadTimes[iter_cnt / 10] = load_time;
             }
-            if (iter_cnt % 100 == 0)
+            if (1 == 0)
             {
                 for (int i = 0; i <= 100; i++)
                 {
@@ -264,7 +264,7 @@ int main(int argc, const char * argv[])
                 //exit(0);
             }
 
-            if (iter_cnt == thresh_log )
+            if (1 == 0 )
             {
                 gettimeofday(&stop, 0);
 
@@ -274,7 +274,7 @@ int main(int argc, const char * argv[])
                 //exit(0);
             }
             canSend = true;
-            //printf("canSend = true\n");
+            printf("canSend = true\n");
             hasRecved = false;
 
         }
