@@ -388,7 +388,7 @@ void workerTd(int worker_id)
         free(dataBuf);
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
+        printf("[%d]recv success time = %lld\n", worker_id, mksp );
         recvCount++;
     }
 }
