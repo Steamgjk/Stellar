@@ -35,6 +35,8 @@ std::vector<int> cb_ids;
 std::vector<Entry> entry_vec[ROW_PS][COL_RS];
 struct Block Pblock;
 struct Block Qblock;
+struct Block Pblocks[CAP];
+struct Block Qblocks[CAP];
 vector<float> oldP;
 vector<float> oldQ;
 bool canSend = false;
@@ -48,6 +50,7 @@ long long calcTimes[2000];
 long long calc_time;
 long long load_time;
 long long loadTimes[2000];
+int pull_fd, push_fd;
 
 int main(int argc, const char * argv[])
 {
@@ -62,6 +65,13 @@ int main(int argc, const char * argv[])
     {
         local_ports[i] = 20000 + i;
         remote_ports[i] = 10000 + i;
+    }
+    for (int i = 0; i < CAP; i++)
+    {
+        Pblocks[i].block_id = -1;
+        Pblocks[i].data_age = -1;
+        Qblocks[i].block_id = -1;
+        Qblocks[i].data_age = -1;
     }
     int thresh_log = 1200;
 
@@ -412,6 +422,7 @@ int wait4connection(char*local_ip, int local_port)
 }
 
 
+//push
 void sendTd(int send_thread_id)
 {
     printf("send_thread_id=%d\n", send_thread_id);
@@ -521,7 +532,197 @@ void sendTd(int send_thread_id)
 
 }
 
+//pull
 void recvTd(int recv_thread_id)
+{
+    printf("recv_thread_id=%d\n", recv_thread_id);
+    int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
+
+    printf("[Td:%d] worker get connection\n", recv_thread_id);
+    size_t struct_sz = sizeof(Block);
+    char* blockbuf = (char*)malloc(struct_sz);
+    char* dataBuf = NULL;
+    size_t data_sz = 0;
+    while (1 == 1)
+    {
+        //printf("recv loop\n");
+        struct timeval st, et;
+        gettimeofday(&st, 0);
+
+        size_t cur_len = 0;
+        int ret = recv(connfd, blockbuf, struct_sz, 0);
+        struct Block* pb = (struct Block*)(void*)blockbuf;
+        data_sz = sizeof(float) * (pb->ele_num);
+        dataBuf = (char*)malloc(data_sz);
+        cur_len = 0;
+        ret = 0;
+        while (cur_len < data_sz)
+        {
+            //printf("recving 2\n");
+            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
+            if (ret < 0)
+            {
+                printf("Mimatch!\n");
+            }
+            cur_len += ret;
+        }
+
+        if (pb->block_id < WORKER_NUM)
+        {
+            //is Pblock
+            int pbid = pb->block_id;
+            Pblocks[pbid].block_id = pbid;
+            Pblocks[pbid].sta_idx = pb->sta_idx;
+            Pblocks[pbid].height = pb->height;
+            Pblocks[pbid].ele_num = pb->ele_num;
+            Pblocks[pbid].eles.resize(pb->ele_num);
+            float* data_eles = (float*)(void*)dataBuf;
+            for (int i = 0; i < Pblocks[pbid].ele_num; i++)
+            {
+                Pblocks[pbid].eles[i] = data_eles[i];
+            }
+            Pblocks[pbid].data_age = pb->data_age;
+        }
+        else
+        {
+            int qbid = pb->block_id - WORKER_NUM;
+            Qblocks[qbid].block_id = qbid;
+            Qblocks[qbid].sta_idx = pb->sta_idx;
+            Qblocks[qbid].height = pb->height;
+            Qblocks[qbid].ele_num = pb->ele_num;
+            Qblocks[qbid].eles.resize(pb->ele_num);
+            float* data_eles = (float*)(void*)dataBuf;
+            for (int i = 0; i < Qblocks[qbid].ele_num; i++)
+            {
+                Qblocks[qbid].eles[i] = data_eles[i];
+            }
+            Qblocks[qbid].data_age = pb->data_age;
+        }
+
+
+        free(data_eles);
+
+
+        gettimeofday(&et, 0);
+        long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
+        printf("recv  blocks time = %lld\n", mksp);
+
+        hasRecved = true;
+    }
+}
+
+
+
+void sendTd1(int send_thread_id)
+{
+    printf("send_thread_id=%d\n", send_thread_id);
+    char* remote_ip = remote_ips[send_thread_id];
+    int remote_port = remote_ports[send_thread_id];
+    int fd;
+    int check_ret;
+    fd = socket(PF_INET, SOCK_STREAM , 0);
+    assert(fd >= 0);
+
+    struct sockaddr_in address;
+    bzero(&address, sizeof(address));
+    //转换成网络地址
+    address.sin_port = htons(remote_port);
+    address.sin_family = AF_INET;
+    //地址转换
+    inet_pton(AF_INET, remote_ip, &address.sin_addr);
+    do
+    {
+        check_ret = connect(fd, (struct sockaddr*) &address, sizeof(address));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    while (check_ret < 0);
+    assert(check_ret >= 0);
+    //发送数据
+    printf("connect to %s %d\n", remote_ip, remote_port);
+    while (1 == 1)
+    {
+        //printf("canSend=%d\n", canSend );
+        if (canSend)
+        {
+            printf("Td:%d cansend\n", thread_id );
+            size_t struct_sz = sizeof(Block);
+            size_t data_sz = sizeof(float) * Pblock.ele_num;
+            char* buf = (char*)malloc(struct_sz + data_sz);
+            memcpy(buf, &(Pblock), struct_sz);
+            memcpy(buf + struct_sz, (char*) & (Pblock.eles[0]), data_sz);
+
+            size_t total_len = struct_sz + data_sz;
+            printf("total_len=%ld struct_sz=%ld data_sz=%ld  elenum=%d\n", total_len, struct_sz, data_sz, Pblock.ele_num );
+            //struct timeval st, et, tspan;
+            size_t sent_len = 0;
+            size_t remain_len = total_len;
+            int ret = -1;
+            size_t to_send_len = 4096;
+            //gettimeofday(&st, 0);
+            while (remain_len > 0)
+            {
+                if (to_send_len > remain_len)
+                {
+                    to_send_len = remain_len;
+                }
+                //printf("sending...\n");
+                ret = send(fd, buf + sent_len, to_send_len, 0);
+                if (ret >= 0)
+                {
+                    remain_len -= to_send_len;
+                    sent_len += to_send_len;
+                    //printf("remain_len = %ld\n", remain_len);
+                }
+                else
+                {
+                    printf("still fail\n");
+                }
+                //getchar();
+            }
+            free(buf);
+            data_sz = sizeof(float) * Qblock.ele_num;
+            total_len = struct_sz + data_sz;
+            buf = (char*)malloc(struct_sz + data_sz);
+            memcpy(buf, &(Qblock), struct_sz);
+            memcpy(buf + struct_sz , (char*) & (Qblock.eles[0]), data_sz);
+            printf("Q  total_len=%ld struct_sz=%ld data_sz=%ld ele_num=%d\n", total_len, struct_sz, data_sz, Qblock.ele_num );
+            sent_len = 0;
+            remain_len = total_len;
+            ret = -1;
+            to_send_len = 4096;
+            while (remain_len > 0)
+            {
+                if (to_send_len > remain_len)
+                {
+                    to_send_len = remain_len;
+                }
+                //printf("sending...\n");
+                ret = send(fd, buf + sent_len, to_send_len, 0);
+                if (ret >= 0)
+                {
+                    remain_len -= to_send_len;
+                    sent_len += to_send_len;
+                }
+                else
+                {
+                    printf("still fail\n");
+                }
+            }
+
+            free(buf);
+            /*
+            gettimeofday(&et, 0);
+            long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
+            printf("send two blocks mksp=%lld\n", mksp );
+            **/
+            canSend = false;
+        }
+
+    }
+
+}
+
+void recvTd1(int recv_thread_id)
 {
     printf("recv_thread_id=%d\n", recv_thread_id);
     int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
