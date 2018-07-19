@@ -60,7 +60,7 @@ using namespace std;
 /**Yahoo!Music **/
 
 #define FILE_NAME "./trainDS/"
-#define TEST_NAME "./testDS"
+#define TEST_NAME "./validationDS"
 #define N 1000990
 #define M 624961
 #define K  100 //主题个数
@@ -124,6 +124,8 @@ void sendTd(int send_thread_id);
 void recvTd(int recv_thread_id);
 void partitionP(Block* Pblocks);
 void partitionQ(Block* Qblocks);
+float CalcRMSE();
+void LoadTestRating();
 
 atomic_int recvCount(0);
 bool canSend[CAP] = {false};
@@ -133,8 +135,10 @@ int row_lens[20];
 int col_lens[20];
 int row_unit = ROW_UNIT * (ROW_PS / WORKER_NUM);
 int col_unit = COL_UNIT * (COL_RS / WORKER_NUM);
-
 long long time_span[300];
+std::vector<int> vec_uids;
+std::vector<int> vec_mids;
+std::vector<float> vec_rates;
 int iter_t = 0;
 int main(int argc, const char * argv[])
 {
@@ -154,6 +158,8 @@ int main(int argc, const char * argv[])
     {
         WORKER_NUM = atoi(argv[1]) ;
     }
+    LoadTestRating();
+
     for (int recv_thread_id = 0; recv_thread_id < WORKER_NUM; recv_thread_id++)
     {
         int thid = recv_thread_id;
@@ -170,11 +176,12 @@ int main(int argc, const char * argv[])
     printf("wait for 3s\n");
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     srand(1);
-    //LoadTestRating();
+
 
 
     row_unit = ROW_UNIT * (ROW_PS / WORKER_NUM);
     col_unit = COL_UNIT * (COL_RS / WORKER_NUM);
+    printf("row_unit = %d col_unit=%d\n", row_unit, col_unit );
     for (int i = 0; i < WORKER_NUM; i++)
     {
         row_lens[i] = i * row_unit;
@@ -188,6 +195,7 @@ int main(int argc, const char * argv[])
     partitionQ(Qblocks);
     for (int i = 0; i < WORKER_NUM; i++)
     {
+        printf("Psz [%d][%ld]  Qsz [%d][%ld]\n", Pblocks[i].ele_num, Pblocks[i].eles.size(), Qblocks[i].ele_num, Qblocks[i].eles.size() );
         for (int j = 0; j < Pblocks[i].ele_num; j++)
         {
             Pblocks[i].eles[j] = drand48() * 0.2;
@@ -197,6 +205,8 @@ int main(int argc, const char * argv[])
             Qblocks[i].eles[j] = drand48() * 0.2;
         }
     }
+    float ini_rmse = CalcRMSE();
+    printf("ini_rmse = %f\n", ini_rmse );
 
     for (int i = 0; i < WORKER_NUM; i++)
     {
@@ -239,7 +249,8 @@ int main(int argc, const char * argv[])
             {
                 gettimeofday(&ed, 0);
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
-                printf("time= %d\t%lld\n", iter_t, time_span[iter_t / 10] );
+                float rmse = CalcRMSE();
+                printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
             }
             recvCount = 0;
         }
@@ -262,16 +273,43 @@ int main(int argc, const char * argv[])
     return 0;
 }
 
-void CalcRMSE()
+void LoadTestRating()
 {
+    vec_mids.clear();
+    vec_uids.clear();
+    vec_rates.clear();
     ifstream ifs(TEST_NAME, ios::in | ios::out);
-    float rmse = 0;
-    int cnt = 0;
     int user_id, movie_id;
     float rate;
+    int test_cnt = 0;
     while (!ifs.eof())
     {
         ifs >> user_id >> movie_id >> rate;
+        vec_uids.push_back(user_id);
+        vec_mids.push_back(movie_id);
+        vec_rates.push_back(rate);
+        /*
+        test_cnt++;
+        if (test_cnt % 10000 == 0)
+        {
+            printf("test_cnt=%d\n",  test_cnt);
+        }
+        **/
+    }
+}
+float CalcRMSE()
+{
+    float rmse = 0;
+    size_t cnt = 0;
+    size_t ele_num = vec_rates.size();
+    int user_id, movie_id;
+    float rate;
+
+    for (cnt = 0; cnt < ele_num; cnt++)
+    {
+        user_id = vec_uids[cnt];
+        movie_id = vec_mids[cnt];
+        rate = vec_rates[cnt];
         int pblock_idx = user_id / row_unit;
         int qblock_idx = movie_id / col_unit;
         int p_ini_idx = user_id - (pblock_idx * row_unit);
@@ -279,13 +317,13 @@ void CalcRMSE()
         float sum = 0;
         for (int i = 0; i < K; i++)
         {
-            sum += Pblocks[pblock_idx].eles[p_ini_idx * K + i] * Qblocks[qblock_idx].eles[q_ini_idx * K + i];
+            sum += (Pblocks[pblock_idx].eles[p_ini_idx * K + i] * 10) * (Qblocks[qblock_idx].eles[q_ini_idx * K + i] * 10);
         }
         rmse += (rate - sum) * (rate - sum);
-        cnt++;
     }
-    rmse = rmse / cnt;
+    rmse = sqrt(rmse / cnt);
     printf("rmse= %f\n", rmse);
+    return rmse;
 }
 void WriteLog(Block & Pb, Block & Qb, int iter_cnt)
 {
@@ -579,6 +617,7 @@ void partitionP(Block * Pblocks)
     int i = 0;
     int height = row_unit;
     int last_height = N - (WORKER_NUM - 1) * height;
+    printf("P height=%d  last_height=%d\n", height, last_height );
     for (i = 0; i < WORKER_NUM; i++)
     {
         Pblocks[i].block_id = i;
@@ -601,7 +640,7 @@ void partitionQ(Block * Qblocks)
     int i = 0;
     int height = col_unit;
     int last_height = M - (WORKER_NUM - 1) * height;
-
+    printf("Q height=%d  last_height=%d\n", height, last_height );
     for (i = 0; i < WORKER_NUM; i++)
     {
         Qblocks[i].block_id = i;

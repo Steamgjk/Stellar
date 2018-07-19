@@ -235,9 +235,9 @@ int main(int argc, const char * argv[])
             }
 
             //SGD
-            printf("before submf\n");
+            //printf("before submf\n");
             submf();
-            printf("after submf\n");
+            //printf("after submf\n");
             iter_cnt++;
             if (iter_cnt % 10 == 0)
             {
@@ -347,17 +347,18 @@ void WriteLog(Block&Pb, Block&Qb, int iter_cnt)
 
 void CalcUpdt(int td_id)
 {
-    printf("CalcUpdt[%d]\n", td_id );
+
     while (1 == 1)
     {
 
         if (StartCalcUpdt[td_id] == true)
         {
-            printf("enter CalcUpdt\n");
+            //printf("enter CalcUpdt\n");
             int times_thresh = 5000;
             int p_block_idx = rb_ids[td_id];
             int q_block_idx = cb_ids[td_id];
             size_t block_sz = entry_vec[p_block_idx][q_block_idx].size();
+            printf("CalcUpdt[%d] pid=%d qid=%d block_sz=%ld\n", td_id, p_block_idx, q_block_idx, block_sz );
 
             if (block_sz == 0)
             {
@@ -423,7 +424,12 @@ void submf()
     }
     random_shuffle(rb_ids.begin(), rb_ids.end()); //迭代器
     random_shuffle(cb_ids.begin(), cb_ids.end()); //迭代器
-
+    /*
+    for (size_t i = 0; i < rb_ids.size(); i++)
+    {
+        printf("%d %d\n", rb_ids[i], cb_ids[i]);
+    }
+    **/
     struct timeval beg, ed;
     long long mksp;
     gettimeofday(&beg, 0);

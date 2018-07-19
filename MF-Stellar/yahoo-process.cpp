@@ -32,14 +32,16 @@ using namespace std;
 #define ROW_UNIT (N/ROW_PS +1)
 #define COL_UNIT (M/COL_RS +1)
 #define TrainF "./trainIdx1.txt"
-#define TestF "./testIdx1.txt"
+//#define TestF "./testIdx1.txt"
+#define TestF "./validationIdx1.txt"
 std::map<long, double> Rmap;
 std::map<long, double> RTest;
 std::map<long, double> OutPutTrain[ROW_PS][COL_RS];
 //max_user=1000989 min_user=0
 //#define OutTrainF "./yahoo-output/train-"
 #define OutTrainF "./trainDS/"
-#define OutTestF "./testDS"
+//#define OutTestF "./testDS"
+#define OutTestF "./validationDS"
 
 void writeFile(int idx)
 {
@@ -114,7 +116,7 @@ int main()
 			}
 		}
 	}
-	printf("test fini\n");
+	printf("test fini=%d\n", test_cnt);
 	exit(0);
 
 
