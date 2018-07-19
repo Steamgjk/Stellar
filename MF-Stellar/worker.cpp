@@ -170,7 +170,7 @@ int main(int argc, const char * argv[])
     }
 
     int row_unit = ROW_PS / WORKER_NUM;
-    for (int i = 0; i < LoadData WORKER_NUM; i++)
+    for (int i = 0; i < WORKER_NUM; i++)
     {
         row_lens[i] = i * row_unit;
         printf("row_lens[%d]=%d\n", i, row_lens[i] );
@@ -198,8 +198,6 @@ int main(int argc, const char * argv[])
     bool isstart = false;
     LoadData();
     printf("Load Rating Success\n");
-
-
 
     {
         printf("recv th_id=%d\n", thread_id );
@@ -245,7 +243,7 @@ int main(int argc, const char * argv[])
             submf();
             //printf("after submf\n");
             iter_cnt++;
-            if (iter_cnt % 10 == 0)
+            if (1 == 0)
             {
                 //WriteLog(Pblock, Qblock, iter_cnt);
                 calcTimes[iter_cnt / 10] = calc_time;
