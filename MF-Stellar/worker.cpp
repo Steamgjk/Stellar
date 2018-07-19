@@ -294,6 +294,7 @@ void LoadData()
         }
     }
     **/
+    printf("loading data thread_id=%d  len_sta %d len_end  %d\n", thread_id, row_lens[thread_id], row_lens[thread_id + 1] );
     char fn[100];
     int user_id, movie_id;
     float rate;
