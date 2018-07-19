@@ -5,41 +5,8 @@
 //  Created by Jinkun Geng on 18/05/11.
 //  Copyright (c) 2016年 Jinkun Geng. All rights reserved.
 //
-
-#include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <cmath>
-#include <time.h>
-#include <vector>
-#include <list>
-#include <thread>
-#include <chrono>
-#include <algorithm>
-#include <mutex>
-#include <atomic>
-#include <fstream>
-#include <sys/time.h>
-#include <map>
-
-
+#include "stellar_common.h"
 using namespace std;
-#define CAP 2000
-//#define FILE_NAME "./netflix_row.txt"
-//#define TEST_NAME "./test_out.txt"
-//#define N  17770 // row number
-//#define M  2649429 //col number
-//#define K  40 //主题个数
-
-//#define FILE_NAME "./movielen10M_train.txt"
-//#define TEST_NAME "./movielen10M_test.txt"
 
 /*
 #define FILE_NAME "./mdata/traina-"
@@ -59,63 +26,6 @@ using namespace std;
 **/
 /**Yahoo!Music **/
 
-#define FILE_NAME "/home/shuai/oneword/trainDS/"
-#define TEST_NAME "/home/shuai/oneword/validationDS"
-#define N 1000990
-#define M 624961
-#define K  100 //主题个数
-#define ROW_PS 64
-#define COL_RS 64
-#define ROW_UNIT (N/ROW_PS +1)
-#define COL_UNIT (M/COL_RS +1)
-
-int WORKER_NUM = 1;
-char* local_ips[CAP] = {"12.12.10.18", "12.12.10.18", "12.12.10.18", "12.12.10.18"};
-int local_ports[CAP] = {4411, 4412, 4413, 4414};
-char* remote_ips[CAP] = {"12.12.10.12", "12.12.10.15", "12.12.10.19", "12.12.10.17"};
-int remote_ports[CAP] = {5511, 5512, 5513, 5514};
-
-struct Block
-{
-    int block_id;
-    int data_age;
-    int sta_idx;
-    int height; //height
-    int ele_num;
-    bool isP;
-    vector<float> eles;
-    Block()
-    {
-
-    }
-    Block operator=(Block& bitem)
-    {
-        block_id = bitem.block_id;
-        data_age = bitem.data_age;
-        height = bitem.height;
-        eles = bitem.eles;
-        ele_num = bitem.ele_num;
-        sta_idx = bitem.sta_idx;
-        return *this;
-    }
-    void printBlock()
-    {
-
-        printf("block_id  %d\n", block_id);
-        printf("data_age  %d\n", data_age);
-        printf("ele_num  %d\n", ele_num);
-        for (size_t i = 0; i < eles.size(); i++)
-        {
-            printf("%f\t", eles[i]);
-        }
-        printf("\n");
-
-    }
-};
-
-struct Block Pblocks[CAP];
-struct Block Qblocks[CAP];
-
 
 
 void WriteLog(Block&Pb, Block&Qb, int iter_cnt);
@@ -127,6 +37,13 @@ void partitionQ(Block* Qblocks);
 float CalcRMSE();
 void LoadTestRating();
 
+int WORKER_NUM = 1;
+char* local_ips[CAP] = {"12.12.10.18", "12.12.10.18", "12.12.10.18", "12.12.10.18"};
+int local_ports[CAP] = {4411, 4412, 4413, 4414};
+char* remote_ips[CAP] = {"12.12.10.12", "12.12.10.15", "12.12.10.19", "12.12.10.17"};
+int remote_ports[CAP] = {5511, 5512, 5513, 5514};
+struct Block Pblocks[CAP];
+struct Block Qblocks[CAP];
 atomic_int recvCount(0);
 bool canSend[CAP] = {false};
 int worker_pidx[CAP];
@@ -140,6 +57,7 @@ std::vector<int> vec_uids;
 std::vector<int> vec_mids;
 std::vector<float> vec_rates;
 int iter_t = 0;
+
 int main(int argc, const char * argv[])
 {
     char* lip  = "127.0.0.1";
@@ -223,10 +141,12 @@ int main(int argc, const char * argv[])
     {
         srand(time(0));
         random_shuffle(worker_qidx, worker_qidx + WORKER_NUM); //迭代器
+        /*
         for (int i = 0; i < WORKER_NUM; i++)
         {
             printf("%d  [%d:%d]\n", i, worker_pidx[i], worker_qidx[i] );
         }
+        **/
         printf("[%d]canSend...!\n", iter_t);
         for (int i = 0; i < WORKER_NUM; i++)
         {
@@ -249,6 +169,7 @@ int main(int argc, const char * argv[])
             {
                 gettimeofday(&ed, 0);
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
+                printf("Calclating RMSE...\n");
                 float rmse = CalcRMSE();
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
             }
@@ -322,7 +243,7 @@ float CalcRMSE()
         rmse += (rate - sum) * (rate - sum);
     }
     rmse = sqrt(rmse / cnt);
-    printf("rmse= %f\n", rmse);
+    //printf("rmse= %f\n", rmse);
     return rmse;
 }
 void WriteLog(Block & Pb, Block & Qb, int iter_cnt)
@@ -352,6 +273,125 @@ void WriteLog(Block & Pb, Block & Qb, int iter_cnt)
     printf("fn:%s\n", fn );
 }
 
+void workerTd(int worker_id)
+{
+    printf("worker_id=%d\n", worker_id);
+    int connfd = wait4connection(local_ips[worker_id], local_ports[worker_id] );
+    printf("Connection worker_id=%d\n",  worker_id);
+    while (1 == 1)
+    {
+        struct timeval st, et;
+        gettimeofday(&st, 0);
+        size_t expected_len = sizeof(Block);
+        char* sockBuf = (char*)malloc(expected_len);
+        size_t cur_len = 0;
+        int ret = 0;
+        while (cur_len < expected_len)
+        {
+            //printf("[Td:%d] cur_len = %ld expected_len-cur_len = %ld\n", recv_thread_id, cur_len, expected_len - cur_len );
+            ret = recv(connfd, sockBuf + cur_len, expected_len - cur_len, 0);
+            if (ret <=  0)
+            {
+                printf("Mimatch! %d\n", ret);
+                if (ret == 0)
+                {
+                    exit(-1);
+                }
+            }
+            //printf("ret=%d\n", ret );
+            cur_len += ret;
+            //printf("cur_len=%d expected_len=%d\n", cur_len, expected_len );
+        }
+        //printf("come here\n");
+        struct Block* pb = (struct Block*)(void*)sockBuf;
+        //pb->printBlock();
+        size_t data_sz = sizeof(float) * (pb->ele_num);
+        char* dataBuf = (char*)malloc(data_sz);
+        cur_len = 0;
+        ret = 0;
+        //printf("pb ele_num %d\n", pb->ele_num );
+        while (cur_len < data_sz)
+        {
+            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
+            if (ret < 0)
+            {
+                printf("Mimatch!\n");
+            }
+            cur_len += ret;
+            // printf("cur_len=%d data_sz=%d\n", cur_len, data_sz );
+        }
+
+        float* data_eles = (float*)(void*)dataBuf;
+        int block_idx = pb->block_id ;
+        Pblocks[block_idx].block_id = pb->block_id;
+        Pblocks[block_idx].sta_idx = pb->sta_idx;
+        Pblocks[block_idx].height = pb->height;
+        Pblocks[block_idx].ele_num = pb->ele_num;
+        Pblocks[block_idx].eles.resize(pb->ele_num);
+        Pblocks[block_idx].isP = pb->isP;
+        for (int i = 0; i < pb->ele_num; i++)
+        {
+            Pblocks[block_idx].eles[i] = data_eles[i];
+        }
+        free(sockBuf);
+        free(dataBuf);
+
+        //printf("successful rece one Block data_sz = %ld block_sz=%ld\n", data_sz, expected_len);
+        expected_len = sizeof(Block);
+        sockBuf = (char*)malloc(expected_len);
+        cur_len = 0;
+        ret = 0;
+        while (cur_len < expected_len)
+        {
+            //printf("[Td:%d] cur_len = %ld expected_len-cur_len = %ld\n", recv_thread_id, cur_len, expected_len - cur_len );
+            ret = recv(connfd, sockBuf + cur_len, expected_len - cur_len, 0);
+            if (ret <=  0)
+            {
+                printf("Mimatch! %d\n", ret);
+                if (ret == 0)
+                {
+                    exit(-1);
+                }
+            }
+            cur_len += ret;
+        }
+        pb = (struct Block*)(void*)sockBuf;
+        data_sz = sizeof(float) * (pb->ele_num);
+        dataBuf = (char*)malloc(data_sz);
+        cur_len = 0;
+        ret = 0;
+        while (cur_len < data_sz)
+        {
+            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
+            if (ret < 0)
+            {
+                printf("Mimatch!\n");
+            }
+            cur_len += ret;
+        }
+
+        data_eles = (float*)(void*)dataBuf;
+        block_idx = pb->block_id ;
+        Qblocks[block_idx].block_id = pb->block_id;
+        Qblocks[block_idx].sta_idx = pb->sta_idx;
+        Qblocks[block_idx].height = pb->height;
+        Qblocks[block_idx].ele_num = pb->ele_num;
+        Qblocks[block_idx].eles.resize(pb->ele_num);
+        Qblocks[block_idx].isP = pb->isP;
+        for (int i = 0; i < pb->ele_num; i++)
+        {
+            Qblocks[block_idx].eles[i] = data_eles[i];
+        }
+
+        //printf("[]successful rece another Block\n");
+        free(sockBuf);
+        free(dataBuf);
+        gettimeofday(&et, 0);
+        long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
+        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
+        recvCount++;
+    }
+}
 void sendTd(int send_thread_id)
 {
     printf("send_thread_id=%d\n", send_thread_id);

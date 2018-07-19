@@ -4,8 +4,8 @@ TARGET = ps
 TARGET1 = worker
 LIBS=-pthread
 CFLAGS=-Wall -g -fpermissive -std=c++11
-OBJS=ps.o
-OBJS1=worker.o
+OBJS=ps.o stellar_common.o
+OBJS1=worker.o stellar_common.o
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LIBS)

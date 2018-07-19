@@ -5,44 +5,19 @@
 //  Created by Jinkun Geng
 //  Copyright (c) 2016年 bikang. All rights reserved.
 //
-
-#include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <cmath>
-#include <time.h>
-#include <vector>
-#include <list>
-#include <thread>
-#include <chrono>
-#include <algorithm>
-#include <mutex>
-#include <iostream>
-#include <fstream>
-#include <sys/time.h>
-#include <map>
+#include "stellar_common.h"
 using namespace std;
 
 
-#define FILE_NAME "/home/shuai/oneword/trainDS/"
-#define TEST_NAME "./yahoo-output/test"
-#define N 1000990
-#define M 624961
-#define K  100 //主题个数
-#define CAP 500
-#define ROW_PS 64
-#define COL_RS 64
-#define ThreshIter 1000
-#define WORKER_THREAD_NUM 4
-int WORKER_NUM = 1;
+int wait4connection(char*local_ip, int local_port);
+void sendTd(int send_thread_id);
+void recvTd(int recv_thread_id);
+void submf();
+void WriteLog(Block&Pb, Block&Qb, int iter_cnt);
+void CalcUpdt(int thread_id);
+void LoadData();
 
+int WORKER_NUM = 1;
 /**Yahoo!Music**/
 double yita = 0.001;
 double theta = 0.05;
@@ -57,66 +32,6 @@ int row_lens[100] = {0};
 int col_lens[100] = {0};
 std::vector<int> rb_ids;
 std::vector<int> cb_ids;
-
-
-
-struct Block
-{
-    int block_id;
-    int data_age;
-    int sta_idx;
-    int height; //height
-    int ele_num;
-    bool isP;
-    vector<float> eles;
-    Block()
-    {
-
-    }
-    Block operator=(Block& bitem)
-    {
-        block_id = bitem.block_id;
-        data_age = bitem.data_age;
-        height = bitem.height;
-        eles = bitem.eles;
-        ele_num = bitem.ele_num;
-        sta_idx = bitem.sta_idx;
-        return *this;
-    }
-    void printBlock()
-    {
-
-        printf("block_id  %d\n", block_id);
-        printf("data_age  %d\n", data_age);
-        printf("ele_num  %d\n", ele_num);
-        for (size_t i = 0; i < eles.size(); i++)
-        {
-            printf("%lf\t", eles[i]);
-        }
-        printf("\n");
-
-    }
-};
-
-struct Entry
-{
-    int user_id;
-    int movie_id;
-    float rate;
-    Entry(int uid, int mid, float rt)
-    {
-        user_id = uid;
-        movie_id = mid;
-        rate = rt;
-    }
-    Entry operator=(Entry& eitem)
-    {
-        user_id = eitem.user_id;
-        movie_id = eitem.movie_id;
-        rate = eitem.rate;
-        return *this;
-    }
-};
 std::vector<Entry> entry_vec[ROW_PS][COL_RS];
 struct Block Pblock;
 struct Block Qblock;
@@ -124,16 +39,6 @@ vector<float> oldP;
 vector<float> oldQ;
 bool canSend = false;
 bool hasRecved = false;
-
-
-int wait4connection(char*local_ip, int local_port);
-void sendTd(int send_thread_id);
-void recvTd(int recv_thread_id);
-void submf();
-void WriteLog(Block&Pb, Block&Qb, int iter_cnt);
-void CalcUpdt(int thread_id);
-void LoadData();
-
 int thread_id = -1;
 struct timeval start, stop, diff;
 bool StartCalcUpdt[100];
@@ -143,6 +48,7 @@ long long calcTimes[2000];
 long long calc_time;
 long long load_time;
 long long loadTimes[2000];
+
 int main(int argc, const char * argv[])
 {
 
