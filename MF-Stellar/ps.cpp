@@ -177,14 +177,20 @@ int main(int argc, const char * argv[])
         printf("RMSE-thd iter_t=%d\n", iter_t );
         //if (recvCount == WORKER_NUM)
         {
-            if (iter_t % 10 == 0 )
+            //if (iter_t % 10 == 0 )
+            if (iter_t == 100)
             {
                 gettimeofday(&ed, 0);
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
+                for (int ii = 0; ii < WORKER_NUM; ii++)
+                {
+                    WriteLog(Pblocks[ii], Qblocks[ii], iter_t);
+                }
                 printf("Calclating RMSE...\n");
                 float rmse = CalcRMSE();
                 ofs << iter_t << "\t" << rmse << endl;
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
+                exit(0);
             }
             recvCount = 0;
         }
