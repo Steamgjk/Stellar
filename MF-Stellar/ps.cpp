@@ -490,6 +490,7 @@ void recvTd(int recv_thread_id)
         else
         {
             // is Qblock
+            block_idx -= WORKER_NUM;
             Qblocks[block_idx].block_id = pb->block_id;
             Qblocks[block_idx].sta_idx = pb->sta_idx;
             Qblocks[block_idx].height = pb->height;
