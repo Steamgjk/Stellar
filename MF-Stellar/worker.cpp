@@ -209,15 +209,18 @@ void WaitforParas(int cur_iter)
 {
     int pbid = thread_id;
     int qbid = (thread_id + cur_iter) % WORKER_NUM;
+    printf("waiting for pid=%d\n", pbid );
     while (Pblocks[pbid].data_age < cur_iter)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     Pblock_ptr = &(Pblocks[pbid]);
+    printf("waiting for qid=%d\n", qbid );
     while (Qblocks[qbid].data_age < cur_iter)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
+    printf("all get\n");
     Qblock_ptr = &(Qblocks[qbid]);
 }
 void LoadData()
