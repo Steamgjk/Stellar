@@ -36,7 +36,7 @@ void partitionP(Block* Pblocks);
 void partitionQ(Block* Qblocks);
 float CalcRMSE();
 void LoadTestRating();
-bool isReady(int block_id, int data_age, int send_fd);
+bool isReady(int block_id, int required_iter, int send_fd);
 int genActivePushfd(int send_thread_id);
 bool curIterFin(int curIter);
 
@@ -298,7 +298,7 @@ void WriteLog(Block & Pb, Block & Qb, int iter_cnt)
     }
     printf("fn:%s\n", fn );
 }
-bool isReady(int block_id, int data_age, int fd)
+bool isReady(int block_id, int required_iter, int fd)
 {
     size_t struct_sz = sizeof(Block);
     size_t data_sz = 0;
@@ -306,15 +306,19 @@ bool isReady(int block_id, int data_age, int fd)
     bool ready = false;
 
     //for BSP constraints
-    if (!curIterFin(data_age - 1))
+#ifdef BSP_MODE
+    if (!curIterFin(required_iter - 1))
     {
         //printf("%d iter cannot start\n", data_age );
         return false;
     }
-    if (iter_t < data_age)
+
+    if (iter_t < required_iter)
     {
         return false;
     }
+#endif
+
     /*
     else
     {
@@ -325,7 +329,9 @@ bool isReady(int block_id, int data_age, int fd)
     if (block_id < WORKER_NUM)
     {
         // is P block
-        if (Pblocks[block_id].data_age >= data_age)
+#ifdef BSP_MODE
+        if (Pblocks[block_id].data_age >= required_iter)
+#endif
         {
             //is P block
             int pbid = block_id;
@@ -335,17 +341,21 @@ bool isReady(int block_id, int data_age, int fd)
             memcpy(buf + struct_sz, (char*) & (Pblocks[pbid].eles[0]), data_sz);
             ready = true;
         }
+#ifdef BSP_MODE
         else
         {
             return false;
         }
+#endif
     }
     else
     {
         // is Q block
         block_id -= WORKER_NUM;
         //printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
-        if (Qblocks[block_id].data_age >= data_age)
+#ifdef BSP_MODE
+        if (Qblocks[block_id].data_age >= required_iter)
+#endif
         {
             int qbid = block_id;
             data_sz = sizeof(float) * Qblocks[qbid].eles.size();
@@ -354,10 +364,12 @@ bool isReady(int block_id, int data_age, int fd)
             memcpy(buf + struct_sz , (char*) & (Qblocks[qbid].eles[0]), data_sz);
             ready = true;
         }
+#ifdef BSP_MODE
         else
         {
             return false;
         }
+#endif
     }
 
     size_t to_send_len = 4096;
