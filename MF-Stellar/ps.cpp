@@ -214,34 +214,35 @@ int main(int argc, const char * argv[])
                         }
 
                     }
+                    printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
                     recvCount = 0;
                 }
                 printf("Calclating RMSE... \n");
-                printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
+
                 /*
                 float rmse = CalcRMSE();
                 ofs << iter_t << "\t" << rmse << endl;
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
                 **/
-                iter_t++;
-                if (iter_t % 100 == 0)
-                {
-                    for (int i = 0; i <= iter_t / 10; i++)
-                    {
-                        printf("%lld\n", time_span[i] );
-                    }
-
-                }
-                if (iter_t == 1200)
-                {
-                    exit(0);
-                }
 
             }
 
-            return 0;
+        }
+        iter_t++;
+        if (iter_t % 100 == 0)
+        {
+            for (int i = 0; i <= iter_t / 10; i++)
+            {
+                printf("%lld\n", time_span[i] );
+            }
+
+        }
+        if (iter_t == 1200)
+        {
+            exit(0);
         }
     }
+    return 0;
 }
 bool curIterFin(int curIter)
 {
