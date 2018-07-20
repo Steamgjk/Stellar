@@ -302,6 +302,7 @@ void CalcUpdt(int td_id)
         {
             //printf("enter CalcUpdt\n");
             int times_thresh = 5000;
+            printf("rb_ids.sz=%ld cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
             int p_block_idx = rb_ids[td_id];
             int q_block_idx = cb_ids[td_id];
             size_t block_sz = entry_vec[p_block_idx][q_block_idx].size();
