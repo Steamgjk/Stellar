@@ -306,7 +306,7 @@ void CalcUpdt(int td_id)
             int p_block_idx = rb_ids[td_id];
             int q_block_idx = cb_ids[td_id];
             size_t block_sz = entry_vec[p_block_idx][q_block_idx].size();
-            printf("CalcUpdt[%d] pid=%d qid=%d block_sz=%ld\n", td_id, p_block_idx, q_block_idx, block_sz );
+            //printf("CalcUpdt[%d] pid=%d qid=%d block_sz=%ld\n", td_id, p_block_idx, q_block_idx, block_sz );
 
             if (block_sz == 0)
             {
@@ -365,7 +365,7 @@ void submf()
     {
         cb_ids.push_back(j);
     }
-    printf("A rb_ids.size=%ld  cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
+    //printf("A rb_ids.size=%ld  cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
     random_shuffle(rb_ids.begin(), rb_ids.end()); //迭代器
     random_shuffle(cb_ids.begin(), cb_ids.end()); //迭代器
     /*
@@ -410,7 +410,7 @@ void submf()
     }
     gettimeofday(&ed, 0);
     mksp = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
-    printf("Calc  time = %lld\n", mksp);
+    //printf("Calc  time = %lld\n", mksp);
 }
 
 
@@ -451,7 +451,7 @@ int wait4connection(char*local_ip, int local_port)
 
 int push_block(int sendfd, Block& blk)
 {
-    printf("Td:%d cansend\n", thread_id );
+    //printf("Td:%d cansend\n", thread_id );
     size_t struct_sz = sizeof(Block);
     size_t data_sz = sizeof(float) * blk.ele_num;
     char* buf = (char*)malloc(struct_sz + data_sz);
@@ -624,7 +624,7 @@ void recvTd(int recv_thread_id)
 
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        printf("recv  blocks time = %lld bid=%d\n", mksp, pb->block_id);
+        //printf("recv  blocks time = %lld bid=%d\n", mksp, pb->block_id);
         hasRecved = true;
     }
 }
