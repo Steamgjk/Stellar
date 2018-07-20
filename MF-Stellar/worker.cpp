@@ -531,8 +531,10 @@ void recvTd(int recv_thread_id)
     char* dataBuf = NULL;
     size_t data_sz = 0;
     int to_recv_cnt = 0;
+    int has_request_cnt = -1;
     bool one_p = false;
     bool one_q = false;
+
     while (1 == 1)
     {
 
@@ -541,12 +543,17 @@ void recvTd(int recv_thread_id)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
+
         struct timeval st, et;
         gettimeofday(&st, 0);
         int ret = -1;
-        printf("send request %d\n", to_recv_cnt );
-        // In stellar, we donot need active pull
-        ret = sendPullReq(to_recv_cnt, connfd);
+        if (has_request_cnt < to_recv_cnt)
+        {
+            printf("send request %d\n", to_recv_cnt );
+            // In stellar, we donot need active pull
+            ret = sendPullReq(to_recv_cnt, connfd);
+            has_request_cnt++;
+        }
 
         size_t cur_len = 0;
         ret = recv(connfd, blockbuf, struct_sz, 0);
