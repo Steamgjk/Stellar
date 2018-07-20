@@ -130,7 +130,7 @@ int main(int argc, const char * argv[])
         std::thread send_thread(sendTd, thread_id);
         send_thread.detach();
         **/
-        push_fd = genPushTd(send_thread_id);
+        push_fd = genPushTd(thread_id);
     }
 
 
