@@ -173,6 +173,7 @@ int main(int argc, const char * argv[])
         {
             gettimeofday(&beg, 0);
         }
+        printf("RMSE-thd iter_t=%d\n", iter_t );
         //if (recvCount == WORKER_NUM)
         {
             if (iter_t % 10 == 0 )
@@ -305,13 +306,15 @@ bool isReady(int block_id, int data_age, int fd)
     //for BSP constraints
     if (!curIterFin(data_age - 1))
     {
-        printf("%d iter cannot start\n", data_age );
+        //printf("%d iter cannot start\n", data_age );
         return false;
     }
+    /*
     else
     {
         printf("%d iter can start\n", data_age );
     }
+    **/
     //getchar();
     if (block_id < WORKER_NUM)
     {
