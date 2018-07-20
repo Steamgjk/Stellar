@@ -380,8 +380,9 @@ int genActivePushfd(int send_thread_id)
 //corresponding to pull in worker
 void sendTd(int send_thread_id)
 {
-    int fd = genActivePushfd(int send_thread_id);
+    int fd = genActivePushfd(send_thread_id);
     char* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
+    int ret = -1;
     while (1 == 1)
     {
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
@@ -465,7 +466,7 @@ void recvTd(int recv_thread_id)
         }
 
         float* data_eles = (float*)(void*)dataBuf;
-        int block_idx = pb->block_id ;
+        int block_id = pb->block_id ;
         if (block_id < WORKER_NUM)
         {
             //is Pblock
