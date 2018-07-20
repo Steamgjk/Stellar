@@ -152,7 +152,7 @@ int main(int argc, const char * argv[])
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         //if (hasRecved)
         {
-            printf("starting iter_cnt=%d\n", iter_cnt);
+            //printf("starting iter_cnt=%d\n", iter_cnt);
             if (!isstart)
             {
                 isstart = true;
@@ -160,7 +160,7 @@ int main(int argc, const char * argv[])
             }
 
             //SGD
-            printf("waiting for Paras\n");
+            //printf("waiting for Paras\n");
             WaitforParas(iter_cnt);
             submf();
             push_block(push_fd, (*Pblock_ptr));
@@ -196,7 +196,7 @@ int main(int argc, const char * argv[])
                 //exit(0);
             }
             canSend = true;
-            printf("canSend = true\n");
+            //printf("canSend = true\n");
             hasRecved = false;
 
         }
@@ -209,19 +209,19 @@ void WaitforParas(int cur_iter)
 {
     int pbid = thread_id;
     int qbid = (thread_id + cur_iter) % WORKER_NUM;
-    printf("waiting for pid=%d\n", pbid );
+    //printf("waiting for pid=%d\n", pbid );
     while (Pblocks[pbid].data_age < cur_iter)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     Pblock_ptr = &(Pblocks[pbid]);
-    printf("waiting for qid=%d\n", qbid );
+    //printf("waiting for qid=%d\n", qbid );
     while (Qblocks[qbid].data_age < cur_iter)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    printf("all get the qbid=%d\n", qbid);
-    printf("qbloc = %p\n",  &(Qblocks[qbid]));
+    //printf("all get the qbid=%d\n", qbid);
+    //printf("qbloc = %p\n",  &(Qblocks[qbid]));
     Qblock_ptr = &(Qblocks[qbid]);
 }
 void LoadData()
@@ -302,7 +302,7 @@ void CalcUpdt(int td_id)
         {
             //printf("enter CalcUpdt\n");
             int times_thresh = 5000;
-            printf("rb_ids.sz=%ld cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
+            //printf("rb_ids.sz=%ld cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
             int p_block_idx = rb_ids[td_id];
             int q_block_idx = cb_ids[td_id];
             size_t block_sz = entry_vec[p_block_idx][q_block_idx].size();

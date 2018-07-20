@@ -64,6 +64,7 @@ int iter_t = 0;
 
 int main(int argc, const char * argv[])
 {
+    ofstream ofs(LOG_FILE, ios::trunc);
     char* lip  = "127.0.0.1";
     for (int i = 0; i < CAP; i++)
     {
@@ -182,6 +183,7 @@ int main(int argc, const char * argv[])
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
                 printf("Calclating RMSE...\n");
                 float rmse = CalcRMSE();
+                ofs << iter_t << "\t" << rmse << endl;
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
             }
             recvCount = 0;
@@ -429,7 +431,7 @@ void sendTd(int send_thread_id)
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
         int required_pid = msg->worker_id;
         int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM + WORKER_NUM;
-        printf("[%d]it is asking for %d iter and pid=%d qid=%d\n", send_thread_id, msg->required_iteration, required_pid, required_qid );
+        //printf("[%d]it is asking for %d iter and pid=%d qid=%d\n", send_thread_id, msg->required_iteration, required_pid, required_qid );
         while (1 == 1)
         {
             if (isReady(required_pid, msg->required_iteration, fd))
@@ -441,7 +443,7 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-        printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
+        //printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
         while (1 == 1)
         {
             if (isReady(required_qid, msg->required_iteration, fd))
@@ -453,8 +455,8 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-        printf("[%d] iter=%d send to worker [%d] qid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_qid  );
-        canSend[send_thread_id] = false;
+        //printf("[%d] iter=%d send to worker [%d] qid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_qid  );
+        //canSend[send_thread_id] = false;
 
     }
 
@@ -558,7 +560,7 @@ void recvTd(int recv_thread_id)
         }
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
+        //printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
 
     }
 }
