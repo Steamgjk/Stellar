@@ -522,7 +522,7 @@ int sendPullReq(int requre_iter, int fd)
 //pull
 void recvTd(int recv_thread_id)
 {
-    printf("recv_thread_id=%d\n", recv_thread_id);
+    printf("recv_thread_id -new =%d\n", recv_thread_id);
     int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
 
     printf("[Td:%d] worker get connection\n", recv_thread_id);
