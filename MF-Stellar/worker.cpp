@@ -162,10 +162,12 @@ int main(int argc, const char * argv[])
             //SGD
             //printf("waiting for Paras\n");
             WaitforParas(iter_cnt);
+            printf("Computing... iter %d\n", iter_cnt);
             submf();
+            printf("Pushing... iter  %d\n", iter_cnt );
             push_block(push_fd, (*Pblock_ptr));
             push_block(push_fd, (*Qblock_ptr));
-            //printf("after submf\n");
+            printf("Pushed... iter %d\n", iter_cnt);
             iter_cnt++;
             if (1 == 0)
             {
