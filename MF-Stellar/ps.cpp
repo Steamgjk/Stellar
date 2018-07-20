@@ -401,7 +401,7 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-        printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration msg->worker_id, required_pid  );
+        printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
         while (1 == 1)
         {
             if (isReady(required_qid, msg->required_iteration, fd))
