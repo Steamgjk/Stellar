@@ -40,6 +40,7 @@ using namespace std;
 #define ThreshIter 1000
 #define WORKER_THREAD_NUM 4
 
+#define LOG_FILE "./rmse_log"
 struct Block
 {
 	int block_id;
