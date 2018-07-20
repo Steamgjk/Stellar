@@ -41,6 +41,8 @@ using namespace std;
 #define WORKER_THREAD_NUM 4
 
 #define LOG_FILE "./rmse_log"
+
+#define ASP_MODE
 struct Block
 {
 	int block_id;

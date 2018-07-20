@@ -210,16 +210,32 @@ void WaitforParas(int cur_iter)
     int pbid = thread_id;
     int qbid = (thread_id + cur_iter) % WORKER_NUM;
     //printf("waiting for pid=%d\n", pbid );
+#ifdef BSP_MODE
     while (Pblocks[pbid].data_age < cur_iter)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
+#endif
+#ifdef ASP_MODE
+        while (Pblocks[pbid].data_age < 0)
+#endif
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+
+
     Pblock_ptr = &(Pblocks[pbid]);
     //printf("waiting for qid=%d\n", qbid );
+#ifdef BSP_MODE
     while (Qblocks[qbid].data_age < cur_iter)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
+#endif
+#ifdef ASP_MODE
+        while (Qblocks[qbid].data_age < 0)
+#endif
+
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+
+
+
     //printf("all get the qbid=%d\n", qbid);
     //printf("qbloc = %p\n",  &(Qblocks[qbid]));
     Qblock_ptr = &(Qblocks[qbid]);
@@ -616,15 +632,17 @@ void recvTd(int recv_thread_id)
         free(dataBuf);
         if (one_p && one_q)
         {
+            printf("received paras for iter %d\n", to_recv_cnt );
             to_recv_cnt++;
             one_p = false;
             one_q = false;
+
         }
 
 
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        //printf("recv  blocks time = %lld bid=%d\n", mksp, pb->block_id);
+
         hasRecved = true;
     }
 }
