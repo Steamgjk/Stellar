@@ -16,6 +16,10 @@ void submf();
 void WriteLog(Block&Pb, Block&Qb, int iter_cnt);
 void CalcUpdt(int thread_id);
 void LoadData();
+int sendPullReq(int requre_iter, int fd);
+int push_block(int sendfd, Block& blk);
+void WaitforParas(int cur_iter);
+int genPushTd(int send_thread_id);
 
 int WORKER_NUM = 1;
 /**Yahoo!Music**/
@@ -33,8 +37,10 @@ int col_lens[100] = {0};
 std::vector<int> rb_ids;
 std::vector<int> cb_ids;
 std::vector<Entry> entry_vec[ROW_PS][COL_RS];
-struct Block Pblock;
-struct Block Qblock;
+//struct Block Pblock;
+//struct Block Qblock;
+struct Block* Pblock_ptr;
+struct Block* Qblock_ptr;
 struct Block Pblocks[CAP];
 struct Block Qblocks[CAP];
 vector<float> oldP;
@@ -54,7 +60,6 @@ int pull_fd, push_fd;
 
 int main(int argc, const char * argv[])
 {
-
     char* lip  = "127.0.0.1";
     for (int i = 0; i < CAP; i++)
     {
@@ -74,12 +79,10 @@ int main(int argc, const char * argv[])
         Qblocks[i].data_age = -1;
     }
     int thresh_log = 1200;
-
     if (argc >= 2)
     {
         thread_id = atoi(argv[1]);
     }
-
     if (argc >= 3)
     {
         WORKER_NUM = atoi(argv[2]);
@@ -108,13 +111,11 @@ int main(int argc, const char * argv[])
     memset(&start, 0, sizeof(struct timeval));
     memset(&stop, 0, sizeof(struct timeval));
     memset(&diff, 0, sizeof(struct timeval));
-
     iter_cnt = 0;
     calc_time = 0;
     bool isstart = false;
     LoadData();
     printf("Load Rating Success\n");
-
     {
         printf("recv th_id=%d\n", thread_id );
         std::thread recv_thread(recvTd, thread_id);
@@ -123,8 +124,11 @@ int main(int argc, const char * argv[])
     printf("wait for you for 3s\n");
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     {
+        /*
         std::thread send_thread(sendTd, thread_id);
         send_thread.detach();
+        **/
+        push_fd = genPushTd(int send_thread_id);
     }
 
 
@@ -144,10 +148,9 @@ int main(int argc, const char * argv[])
     {
         //printf(" hasRecved? %d\n", hasRecved);
         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        if (hasRecved)
+        //if (hasRecved)
         {
-            printf("has Received itercnt=%d\n", iter_cnt);
+            printf("starting iter_cnt=%d\n", iter_cnt);
             if (!isstart)
             {
                 isstart = true;
@@ -156,7 +159,10 @@ int main(int argc, const char * argv[])
 
             //SGD
             //printf("before submf\n");
+            WaitforParas(iter_cnt);
             submf();
+            push_block(push_fd, (*Pblock_ptr));
+            push_block(push_fd, (*Qblock_ptr));
             //printf("after submf\n");
             iter_cnt++;
             if (1 == 0)
@@ -197,6 +203,21 @@ int main(int argc, const char * argv[])
 
 }
 
+void WaitforParas(int cur_iter)
+{
+    int pbid = thread_id;
+    int qbid = (thread_id + cur_iter) % WORKER_NUM;
+    while (Pblocks[pbid].data_age < cur_iter)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    Pblock_ptr = &(Pblocks[pbid]);
+    while (Qblocks[qbid].data_age < cur_iter)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    Qblock_ptr = &(Qblocks[qbid]);
+}
 void LoadData()
 {
     /*
@@ -267,13 +288,10 @@ void WriteLog(Block&Pb, Block&Qb, int iter_cnt)
     }
 }
 
-
 void CalcUpdt(int td_id)
 {
-
     while (1 == 1)
     {
-
         if (StartCalcUpdt[td_id] == true)
         {
             //printf("enter CalcUpdt\n");
@@ -298,12 +316,7 @@ void CalcUpdt(int td_id)
                 int i = user_id - Pblock.sta_idx;
                 int j = movie_id - Qblock.sta_idx;
                 float error = rate;
-                if (i < 0 || j < 0 || i >= Pblock.height || j >= Qblock.height)
-                {
-                    //printf("[%d] continue i=%ld j=%ld  ph=%d  qh=%d \n", td_id, i, j , Pblock.height, Qblock.height);
-                    //getchar();
-                    continue;
-                }
+
                 for (int k = 0; k < K; ++k)
                 {
                     error -= oldP[i * K + k] * oldQ[j * K + k];
@@ -311,10 +324,10 @@ void CalcUpdt(int td_id)
 
                 for (int k = 0; k < K; ++k)
                 {
-                    Pblock.eles[i * K + k] += yita * (error * oldQ[j * K + k] - theta * oldP[i * K + k]);
-                    Qblock.eles[j * K + k] += yita * (error * oldP[i * K + k] - theta * oldQ[j * K + k]);
+                    Pblock_ptr->eles[i * K + k] += yita * (error * oldQ[j * K + k] - theta * oldP[i * K + k]);
+                    Qblock_ptr->eles[j * K + k] += yita * (error * oldP[i * K + k] - theta * oldQ[j * K + k]);
 
-                    if (Pblock.eles[i * K + k] + 1 == Pblock.eles[i * K + k] - 1)
+                    if (Pblock_ptr->eles[i * K + k] + 1 == Pblock_ptr->eles[i * K + k] - 1)
                     {
                         printf("p %d q %d  error =%lf i=%d j=%d k=%d rand_idx=%d vale=%f user_id=%d  movie_id=%d\n", p_block_idx, q_block_idx, error, i, j, k, rand_idx,  rate, user_id, movie_id );
                         getchar();
@@ -330,10 +343,10 @@ void CalcUpdt(int td_id)
 
 void submf()
 {
-    int pid = Pblock.block_id;
-    int qid = Qblock.block_id;
-    oldP = Pblock.eles;
-    oldQ = Qblock.eles;
+    int pid = Pblock_ptr->block_id;
+    int qid = Qblock_ptr->block_id;
+    oldP = Pblock_ptr->eles;
+    oldQ = Qblock_ptr->eles;
 
     rb_ids.clear();
     cb_ids.clear();
@@ -378,12 +391,19 @@ void submf()
             break;
         }
     }
+    //Only send Updates
+    for (int i = 0; i < oldP.size(); i++)
+    {
+        Pblock_ptr->eles[i] -= oldP[i];
+    }
+    for (int i = 0; i < oldQ.size(); i++)
+    {
+        Qblock_ptr->eles[i] -= oldQ[i];
+    }
     gettimeofday(&ed, 0);
     mksp = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
     printf("Calc  time = %lld\n", mksp);
 }
-
-
 
 
 
@@ -421,9 +441,47 @@ int wait4connection(char*local_ip, int local_port)
 
 }
 
+int push_block(int sendfd, Block& blk)
+{
+    printf("Td:%d cansend\n", thread_id );
+    size_t struct_sz = sizeof(Block);
+    size_t data_sz = sizeof(float) * blk.ele_num;
+    char* buf = (char*)malloc(struct_sz + data_sz);
+    memcpy(buf, &(blk), struct_sz);
+    memcpy(buf + struct_sz, (char*) & (blk.eles[0]), data_sz);
+    size_t total_len = struct_sz + data_sz;
+    printf("total_len=%ld struct_sz=%ld data_sz=%ld  elenum=%d\n", total_len, struct_sz, data_sz, blk.ele_num );
 
+    size_t sent_len = 0;
+    size_t remain_len = total_len;
+    int ret = -1;
+    size_t to_send_len = 4096;
+    //gettimeofday(&st, 0);
+    while (remain_len > 0)
+    {
+        if (to_send_len > remain_len)
+        {
+            to_send_len = remain_len;
+        }
+        //printf("sending...\n");
+        ret = send(sendfd, buf + sent_len, to_send_len, 0);
+        if (ret >= 0)
+        {
+            remain_len -= to_send_len;
+            sent_len += to_send_len;
+            //printf("remain_len = %ld\n", remain_len);
+        }
+        else
+        {
+            printf("still fail\n");
+        }
+        //getchar();
+    }
+    free(buf);
+
+}
 //push
-void sendTd(int send_thread_id)
+int genPushTd(int send_thread_id)
 {
     printf("send_thread_id=%d\n", send_thread_id);
     char* remote_ip = remote_ips[send_thread_id];
@@ -432,7 +490,6 @@ void sendTd(int send_thread_id)
     int check_ret;
     fd = socket(PF_INET, SOCK_STREAM , 0);
     assert(fd >= 0);
-
     struct sockaddr_in address;
     bzero(&address, sizeof(address));
     //转换成网络地址
@@ -449,89 +506,17 @@ void sendTd(int send_thread_id)
     assert(check_ret >= 0);
     //发送数据
     printf("connect to %s %d\n", remote_ip, remote_port);
-    while (1 == 1)
-    {
-        //printf("canSend=%d\n", canSend );
-        if (canSend)
-        {
-            printf("Td:%d cansend\n", thread_id );
-            size_t struct_sz = sizeof(Block);
-            size_t data_sz = sizeof(float) * Pblock.ele_num;
-            char* buf = (char*)malloc(struct_sz + data_sz);
-            memcpy(buf, &(Pblock), struct_sz);
-            memcpy(buf + struct_sz, (char*) & (Pblock.eles[0]), data_sz);
-
-            size_t total_len = struct_sz + data_sz;
-            printf("total_len=%ld struct_sz=%ld data_sz=%ld  elenum=%d\n", total_len, struct_sz, data_sz, Pblock.ele_num );
-            //struct timeval st, et, tspan;
-            size_t sent_len = 0;
-            size_t remain_len = total_len;
-            int ret = -1;
-            size_t to_send_len = 4096;
-            //gettimeofday(&st, 0);
-            while (remain_len > 0)
-            {
-                if (to_send_len > remain_len)
-                {
-                    to_send_len = remain_len;
-                }
-                //printf("sending...\n");
-                ret = send(fd, buf + sent_len, to_send_len, 0);
-                if (ret >= 0)
-                {
-                    remain_len -= to_send_len;
-                    sent_len += to_send_len;
-                    //printf("remain_len = %ld\n", remain_len);
-                }
-                else
-                {
-                    printf("still fail\n");
-                }
-                //getchar();
-            }
-            free(buf);
-            data_sz = sizeof(float) * Qblock.ele_num;
-            total_len = struct_sz + data_sz;
-            buf = (char*)malloc(struct_sz + data_sz);
-            memcpy(buf, &(Qblock), struct_sz);
-            memcpy(buf + struct_sz , (char*) & (Qblock.eles[0]), data_sz);
-            printf("Q  total_len=%ld struct_sz=%ld data_sz=%ld ele_num=%d\n", total_len, struct_sz, data_sz, Qblock.ele_num );
-            sent_len = 0;
-            remain_len = total_len;
-            ret = -1;
-            to_send_len = 4096;
-            while (remain_len > 0)
-            {
-                if (to_send_len > remain_len)
-                {
-                    to_send_len = remain_len;
-                }
-                //printf("sending...\n");
-                ret = send(fd, buf + sent_len, to_send_len, 0);
-                if (ret >= 0)
-                {
-                    remain_len -= to_send_len;
-                    sent_len += to_send_len;
-                }
-                else
-                {
-                    printf("still fail\n");
-                }
-            }
-
-            free(buf);
-            /*
-            gettimeofday(&et, 0);
-            long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-            printf("send two blocks mksp=%lld\n", mksp );
-            **/
-            canSend = false;
-        }
-
-    }
-
+    return fd;
 }
 
+int sendPullReq(int requre_iter, int fd)
+{
+    ReqMsg* rm = (ReqMsg*)malloc(sizeof(ReqMsg));
+    rm->required_iteration = requre_iter;
+    rm->worker_id = thread_id;
+    int ret = send(fd, rm, sizeof(ReqMsg), 0);
+    return ret;
+}
 //pull
 void recvTd(int recv_thread_id)
 {
@@ -543,14 +528,22 @@ void recvTd(int recv_thread_id)
     char* blockbuf = (char*)malloc(struct_sz);
     char* dataBuf = NULL;
     size_t data_sz = 0;
+    int to_recv_cnt = 0;
     while (1 == 1)
     {
-        //printf("recv loop\n");
+        if (to_recv_cnt > iter_cnt)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
         struct timeval st, et;
         gettimeofday(&st, 0);
+        int ret = -1;
+        // In stellar, we donot need active pull
+        ret = sendPullReq(to_recv_cnt, connfd);
 
         size_t cur_len = 0;
-        int ret = recv(connfd, blockbuf, struct_sz, 0);
+        ret = recv(connfd, blockbuf, struct_sz, 0);
         struct Block* pb = (struct Block*)(void*)blockbuf;
         data_sz = sizeof(float) * (pb->ele_num);
         dataBuf = (char*)malloc(data_sz);
@@ -586,7 +579,7 @@ void recvTd(int recv_thread_id)
         else
         {
             int qbid = pb->block_id - WORKER_NUM;
-            Qblocks[qbid].block_id = qbid;
+            Qblocks[qbid].block_id = pb->block_id;
             Qblocks[qbid].sta_idx = pb->sta_idx;
             Qblocks[qbid].height = pb->height;
             Qblocks[qbid].ele_num = pb->ele_num;
@@ -598,21 +591,20 @@ void recvTd(int recv_thread_id)
             }
             Qblocks[qbid].data_age = pb->data_age;
         }
-
-
         free(data_eles);
-
+        to_recv_cnt++;
 
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
         printf("recv  blocks time = %lld\n", mksp);
-
         hasRecved = true;
     }
 }
 
 
 
+
+///////////////////////////////////
 void sendTd1(int send_thread_id)
 {
     printf("send_thread_id=%d\n", send_thread_id);

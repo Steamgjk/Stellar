@@ -37,6 +37,7 @@ void partitionQ(Block* Qblocks);
 float CalcRMSE();
 void LoadTestRating();
 bool isReady(int block_id, int data_age, int send_fd);
+int genActivePushfd(int send_thread_id);
 
 int WORKER_NUM = 1;
 char* local_ips[CAP] = {"12.12.10.18", "12.12.10.18", "12.12.10.18", "12.12.10.18"};
@@ -344,9 +345,8 @@ bool isReady(int block_id, int data_age, int fd)
 
     return ready;
 }
-//recving request and then decide can/cannot sent
-//corresponding to pull in worker
-void sendTd(int send_thread_id)
+
+int genActivePushfd(int send_thread_id)
 {
     printf("send_thread_id=%d\n", send_thread_id);
     char* remote_ip = remote_ips[send_thread_id];
@@ -372,12 +372,19 @@ void sendTd(int send_thread_id)
     }
     while (check_ret < 0);
     printf("[Td:%d]connected %s  %d\n", send_thread_id, remote_ip, remote_port );
+    return fd;
+}
+//send only establish the fd vec, send in sequence
+
+//recving request and then decide can/cannot sent
+//corresponding to pull in worker
+void sendTd(int send_thread_id)
+{
+    int fd = genActivePushfd(int send_thread_id);
     char* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
     while (1 == 1)
     {
-
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
-
         int required_pid = msg->worker_id;
         int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM;
         while (1 == 1)
@@ -407,6 +414,192 @@ void sendTd(int send_thread_id)
     }
 
 }
+
+
+
+void recvTd(int recv_thread_id)
+{
+    printf("recv_thread_id=%d\n", recv_thread_id);
+    int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
+    while (1 == 1)
+    {
+        //printf("recving ...\n");
+        struct timeval st, et;
+        gettimeofday(&st, 0);
+        size_t expected_len = sizeof(Block);
+        char* sockBuf = (char*)malloc(expected_len);
+        size_t cur_len = 0;
+        int ret = 0;
+        while (cur_len < expected_len)
+        {
+
+            ret = recv(connfd, sockBuf + cur_len, expected_len - cur_len, 0);
+            if (ret <=  0)
+            {
+                printf("Mimatch! %d\n", ret);
+                if (ret == 0)
+                {
+                    exit(-1);
+                }
+            }
+            //printf("ret=%d\n", ret );
+            cur_len += ret;
+            //printf("cur_len=%d expected_len=%d\n", cur_len, expected_len );
+        }
+        struct Block* pb = (struct Block*)(void*)sockBuf;
+        //pb->printBlock();
+        size_t data_sz = sizeof(float) * (pb->ele_num);
+        char* dataBuf = (char*)malloc(data_sz);
+        cur_len = 0;
+        ret = 0;
+        //printf("pb ele_num %d\n", pb->ele_num );
+        while (cur_len < data_sz)
+        {
+            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
+            if (ret < 0)
+            {
+                printf("Mimatch!\n");
+            }
+            cur_len += ret;
+            // printf("cur_len=%d data_sz=%d\n", cur_len, data_sz );
+        }
+
+        float* data_eles = (float*)(void*)dataBuf;
+        int block_idx = pb->block_id ;
+        if (block_id < WORKER_NUM)
+        {
+            //is Pblock
+            Pblocks[block_idx].block_id = pb->block_id;
+            Pblocks[block_idx].sta_idx = pb->sta_idx;
+            Pblocks[block_idx].height = pb->height;
+            Pblocks[block_idx].ele_num = pb->ele_num;
+            Pblocks[block_idx].eles.resize(pb->ele_num);
+            Pblocks[block_idx].isP = pb->isP;
+            for (int i = 0; i < pb->ele_num; i++)
+            {
+                Pblocks[block_idx].eles[i] += data_eles[i];
+            }
+            Pblocks[block_idx].data_age++;
+        }
+        else
+        {
+            // is Qblock
+            Qblocks[block_idx].block_id = pb->block_id;
+            Qblocks[block_idx].sta_idx = pb->sta_idx;
+            Qblocks[block_idx].height = pb->height;
+            Qblocks[block_idx].ele_num = pb->ele_num;
+            Qblocks[block_idx].eles.resize(pb->ele_num);
+            Qblocks[block_idx].isP = pb->isP;
+            for (int i = 0; i < pb->ele_num; i++)
+            {
+                Qblocks[block_idx].eles[i] += data_eles[i];
+            }
+            Qblocks[block_idx].data_age++;
+        }
+
+        free(sockBuf);
+        free(dataBuf);
+
+
+        gettimeofday(&et, 0);
+        long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
+        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
+        recvCount++;
+    }
+}
+
+int wait4connection(char*local_ip, int local_port)
+{
+    int fd = socket(PF_INET, SOCK_STREAM , 0);
+    struct sockaddr_in address;
+    bzero(&address, sizeof(address));
+    //转换成网络地址
+    address.sin_port = htons(local_port);
+    address.sin_family = AF_INET;
+    //地址转换
+    inet_pton(AF_INET, local_ip, &address.sin_addr);
+    //设置socket buffer大小
+    //int recvbuf = 4096;
+    //int len = sizeof( recvbuf );
+    //setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &recvbuf, sizeof( recvbuf ) );
+    //getsockopt( fd, SOL_SOCKET, SO_RCVBUF, &recvbuf, ( socklen_t* )&len );
+    //printf( "the receive buffer size after settting is %d\n", recvbuf );
+    //绑定ip和端口
+    int check_ret = -1;
+    do
+    {
+        printf("binding... %s  %d\n", local_ip, local_port);
+        check_ret = bind(fd, (struct sockaddr*)&address, sizeof(address));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    while (check_ret >= 0);
+
+    //创建监听队列，用来存放待处理的客户连接
+    check_ret = listen(fd, 5);
+    assert(check_ret >= 0);
+    printf("listening... %s  %d\n", local_ip, local_port);
+    struct sockaddr_in addressClient;
+    socklen_t clientLen = sizeof(addressClient);
+    //接受连接，阻塞函数
+    int connfd = accept(fd, (struct sockaddr*)&addressClient, &clientLen);
+    printf("get connection from %s  %d\n", inet_ntoa(addressClient.sin_addr), addressClient.sin_port);
+    return connfd;
+
+}
+
+
+
+void partitionP(Block * Pblocks)
+{
+    int i = 0;
+    int height = row_unit;
+    int last_height = N - (WORKER_NUM - 1) * height;
+    printf("P height=%d  last_height=%d\n", height, last_height );
+    for (i = 0; i < WORKER_NUM; i++)
+    {
+        Pblocks[i].block_id = i;
+        Pblocks[i].data_age = 0;
+        Pblocks[i].eles.clear();
+        Pblocks[i].height = height;
+        if ( i == WORKER_NUM - 1)
+        {
+            Pblocks[i].height = last_height;
+        }
+        Pblocks[i].sta_idx = row_lens[i];
+        Pblocks[i].ele_num = Pblocks[i].height * K;
+        Pblocks[i].eles.resize(Pblocks[i].ele_num);
+    }
+
+}
+
+void partitionQ(Block * Qblocks)
+{
+    int i = 0;
+    int height = col_unit;
+    int last_height = M - (WORKER_NUM - 1) * height;
+    printf("Q height=%d  last_height=%d\n", height, last_height );
+    for (i = 0; i < WORKER_NUM; i++)
+    {
+        Qblocks[i].block_id = i + WORKER_NUM;
+        Qblocks[i].data_age = 0;
+        Qblocks[i].eles.clear();
+        Qblocks[i].height = height;
+        if ( i == WORKER_NUM - 1)
+        {
+            Qblocks[i].height = last_height;
+        }
+        Qblocks[i].sta_idx = col_lens[i];
+        Qblocks[i].ele_num = Qblocks[i].height * K;
+        Qblocks[i].eles.resize(Qblocks[i].ele_num);
+
+    }
+
+}
+
+
+
+
+//////////////////////////////////
 
 void sendTd1(int send_thread_id)
 {
@@ -506,98 +699,6 @@ void sendTd1(int send_thread_id)
         }
     }
 
-}
-
-
-void recvTd(int recv_thread_id)
-{
-    printf("recv_thread_id=%d\n", recv_thread_id);
-    int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
-    while (1 == 1)
-    {
-        //printf("recving ...\n");
-        struct timeval st, et;
-        gettimeofday(&st, 0);
-        size_t expected_len = sizeof(Block);
-        char* sockBuf = (char*)malloc(expected_len);
-        size_t cur_len = 0;
-        int ret = 0;
-        while (cur_len < expected_len)
-        {
-
-            ret = recv(connfd, sockBuf + cur_len, expected_len - cur_len, 0);
-            if (ret <=  0)
-            {
-                printf("Mimatch! %d\n", ret);
-                if (ret == 0)
-                {
-                    exit(-1);
-                }
-            }
-            //printf("ret=%d\n", ret );
-            cur_len += ret;
-            //printf("cur_len=%d expected_len=%d\n", cur_len, expected_len );
-        }
-        struct Block* pb = (struct Block*)(void*)sockBuf;
-        //pb->printBlock();
-        size_t data_sz = sizeof(float) * (pb->ele_num);
-        char* dataBuf = (char*)malloc(data_sz);
-        cur_len = 0;
-        ret = 0;
-        //printf("pb ele_num %d\n", pb->ele_num );
-        while (cur_len < data_sz)
-        {
-            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
-            if (ret < 0)
-            {
-                printf("Mimatch!\n");
-            }
-            cur_len += ret;
-            // printf("cur_len=%d data_sz=%d\n", cur_len, data_sz );
-        }
-
-        float* data_eles = (float*)(void*)dataBuf;
-        int block_idx = pb->block_id ;
-        if (block_id < WORKER_NUM)
-        {
-            //is Pblock
-            Pblocks[block_idx].block_id = pb->block_id;
-            Pblocks[block_idx].sta_idx = pb->sta_idx;
-            Pblocks[block_idx].height = pb->height;
-            Pblocks[block_idx].ele_num = pb->ele_num;
-            Pblocks[block_idx].eles.resize(pb->ele_num);
-            Pblocks[block_idx].isP = pb->isP;
-            for (int i = 0; i < pb->ele_num; i++)
-            {
-                Pblocks[block_idx].eles[i] += data_eles[i];
-            }
-            Pblocks[block_idx].data_age++;
-        }
-        else
-        {
-            // is Qblock
-            Qblocks[block_idx].block_id = pb->block_id;
-            Qblocks[block_idx].sta_idx = pb->sta_idx;
-            Qblocks[block_idx].height = pb->height;
-            Qblocks[block_idx].ele_num = pb->ele_num;
-            Qblocks[block_idx].eles.resize(pb->ele_num);
-            Qblocks[block_idx].isP = pb->isP;
-            for (int i = 0; i < pb->ele_num; i++)
-            {
-                Qblocks[block_idx].eles[i] += data_eles[i];
-            }
-            Qblocks[block_idx].data_age++;
-        }
-
-        free(sockBuf);
-        free(dataBuf);
-
-
-        gettimeofday(&et, 0);
-        long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
-        recvCount++;
-    }
 }
 
 void recvTd1(int recv_thread_id)
@@ -719,91 +820,3 @@ void recvTd1(int recv_thread_id)
         recvCount++;
     }
 }
-int wait4connection(char*local_ip, int local_port)
-{
-    int fd = socket(PF_INET, SOCK_STREAM , 0);
-    struct sockaddr_in address;
-    bzero(&address, sizeof(address));
-    //转换成网络地址
-    address.sin_port = htons(local_port);
-    address.sin_family = AF_INET;
-    //地址转换
-    inet_pton(AF_INET, local_ip, &address.sin_addr);
-    //设置socket buffer大小
-    //int recvbuf = 4096;
-    //int len = sizeof( recvbuf );
-    //setsockopt( fd, SOL_SOCKET, SO_RCVBUF, &recvbuf, sizeof( recvbuf ) );
-    //getsockopt( fd, SOL_SOCKET, SO_RCVBUF, &recvbuf, ( socklen_t* )&len );
-    //printf( "the receive buffer size after settting is %d\n", recvbuf );
-    //绑定ip和端口
-    int check_ret = -1;
-    do
-    {
-        printf("binding... %s  %d\n", local_ip, local_port);
-        check_ret = bind(fd, (struct sockaddr*)&address, sizeof(address));
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
-    while (check_ret >= 0);
-
-    //创建监听队列，用来存放待处理的客户连接
-    check_ret = listen(fd, 5);
-    assert(check_ret >= 0);
-    printf("listening... %s  %d\n", local_ip, local_port);
-    struct sockaddr_in addressClient;
-    socklen_t clientLen = sizeof(addressClient);
-    //接受连接，阻塞函数
-    int connfd = accept(fd, (struct sockaddr*)&addressClient, &clientLen);
-    printf("get connection from %s  %d\n", inet_ntoa(addressClient.sin_addr), addressClient.sin_port);
-    return connfd;
-
-}
-
-
-
-void partitionP(Block * Pblocks)
-{
-    int i = 0;
-    int height = row_unit;
-    int last_height = N - (WORKER_NUM - 1) * height;
-    printf("P height=%d  last_height=%d\n", height, last_height );
-    for (i = 0; i < WORKER_NUM; i++)
-    {
-        Pblocks[i].block_id = i;
-        Pblocks[i].data_age = 0;
-        Pblocks[i].eles.clear();
-        Pblocks[i].height = height;
-        if ( i == WORKER_NUM - 1)
-        {
-            Pblocks[i].height = last_height;
-        }
-        Pblocks[i].sta_idx = row_lens[i];
-        Pblocks[i].ele_num = Pblocks[i].height * K;
-        Pblocks[i].eles.resize(Pblocks[i].ele_num);
-    }
-
-}
-
-void partitionQ(Block * Qblocks)
-{
-    int i = 0;
-    int height = col_unit;
-    int last_height = M - (WORKER_NUM - 1) * height;
-    printf("Q height=%d  last_height=%d\n", height, last_height );
-    for (i = 0; i < WORKER_NUM; i++)
-    {
-        Qblocks[i].block_id = i;
-        Qblocks[i].data_age = 0;
-        Qblocks[i].eles.clear();
-        Qblocks[i].height = height;
-        if ( i == WORKER_NUM - 1)
-        {
-            Qblocks[i].height = last_height;
-        }
-        Qblocks[i].sta_idx = col_lens[i];
-        Qblocks[i].ele_num = Qblocks[i].height * K;
-        Qblocks[i].eles.resize(Qblocks[i].ele_num);
-
-    }
-
-}
-
