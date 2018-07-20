@@ -351,7 +351,7 @@ void CalcUpdt(int td_id)
 void submf()
 {
     int pid = Pblock_ptr->block_id;
-    int qid = Qblock_ptr->block_id;
+    int qid = Qblock_ptr->block_id - WORKER_NUM;
     oldP = Pblock_ptr->eles;
     oldQ = Qblock_ptr->eles;
 
