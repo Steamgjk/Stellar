@@ -162,7 +162,7 @@ int main(int argc, const char * argv[])
             //SGD
             //printf("waiting for Paras\n");
             WaitforParas(iter_cnt);
-            printf("Computing... iter %d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->data_age, Qblock_ptr->data_age);
+            printf("Computing... iter %d pbid=%d qbid=%d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->block_id, Qblock_ptr->block_id, Pblock_ptr->data_age, Qblock_ptr->data_age);
             submf();
             printf("Pushing... iter  %d\n", iter_cnt );
             push_block(push_fd, (*Pblock_ptr));
