@@ -443,7 +443,7 @@ void sendTd(int send_thread_id)
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
         int required_pid = msg->worker_id;
         int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM + WORKER_NUM;
-        //printf("[%d]it is asking for %d iter and pid=%d qid=%d\n", send_thread_id, msg->required_iteration, required_pid, required_qid );
+        printf("[%d]it is asking for %d iter and pid=%d qid=%d\n", send_thread_id, msg->required_iteration, required_pid, required_qid );
         while (1 == 1)
         {
             if (isReady(required_pid, msg->required_iteration, fd))
@@ -455,7 +455,7 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-        //printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
+        printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
         while (1 == 1)
         {
             if (isReady(required_qid, msg->required_iteration, fd))
