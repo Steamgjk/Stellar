@@ -164,7 +164,7 @@ int main(int argc, const char * argv[])
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
         **/
-        if (!curIterFin(iter_cnt))
+        if (!curIterFin(iter_t))
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
