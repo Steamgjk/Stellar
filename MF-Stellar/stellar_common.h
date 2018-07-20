@@ -98,4 +98,12 @@ struct Entry
 	}
 };
 
+struct ReqMsg
+{
+	//int block_id;
+	int required_iteration;
+	int worker_id;
+	//I am worker id, I ask for my required(dependent) parameter at Iteration data age (i.e. the data age of the parameter should be no less than data-age)
+};
+
 #endif
