@@ -37,8 +37,10 @@ int col_lens[100] = {0};
 std::vector<int> rb_ids;
 std::vector<int> cb_ids;
 std::vector<Entry> entry_vec[ROW_PS][COL_RS];
-//struct Block Pblock;
-//struct Block Qblock;
+//obselete
+struct Block Pblock;
+struct Block Qblock;
+/////////////////
 struct Block* Pblock_ptr;
 struct Block* Qblock_ptr;
 struct Block Pblocks[CAP];
@@ -128,7 +130,7 @@ int main(int argc, const char * argv[])
         std::thread send_thread(sendTd, thread_id);
         send_thread.detach();
         **/
-        push_fd = genPushTd(int send_thread_id);
+        push_fd = genPushTd(send_thread_id);
     }
 
 
@@ -313,8 +315,8 @@ void CalcUpdt(int td_id)
                 int movie_id = entry_vec[p_block_idx][q_block_idx][rand_idx].movie_id;
                 int user_id = entry_vec[p_block_idx][q_block_idx][rand_idx].user_id;
                 float rate = entry_vec[p_block_idx][q_block_idx][rand_idx].rate;
-                int i = user_id - Pblock.sta_idx;
-                int j = movie_id - Qblock.sta_idx;
+                int i = user_id - Pblock_ptr->sta_idx;
+                int j = movie_id - Qblock_ptr->sta_idx;
                 float error = rate;
 
                 for (int k = 0; k < K; ++k)
@@ -392,11 +394,11 @@ void submf()
         }
     }
     //Only send Updates
-    for (int i = 0; i < oldP.size(); i++)
+    for (size_t i = 0; i < oldP.size(); i++)
     {
         Pblock_ptr->eles[i] -= oldP[i];
     }
-    for (int i = 0; i < oldQ.size(); i++)
+    for (size_t i = 0; i < oldQ.size(); i++)
     {
         Qblock_ptr->eles[i] -= oldQ[i];
     }
@@ -478,7 +480,7 @@ int push_block(int sendfd, Block& blk)
         //getchar();
     }
     free(buf);
-
+    return 0;
 }
 //push
 int genPushTd(int send_thread_id)
@@ -591,7 +593,7 @@ void recvTd(int recv_thread_id)
             }
             Qblocks[qbid].data_age = pb->data_age;
         }
-        free(data_eles);
+        free(dataBuf);
         to_recv_cnt++;
 
         gettimeofday(&et, 0);
@@ -605,6 +607,7 @@ void recvTd(int recv_thread_id)
 
 
 ///////////////////////////////////
+
 void sendTd1(int send_thread_id)
 {
     printf("send_thread_id=%d\n", send_thread_id);
