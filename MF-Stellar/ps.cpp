@@ -388,7 +388,7 @@ void sendTd(int send_thread_id)
     {
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
         int required_pid = msg->worker_id;
-        int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM;
+        int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM + WORKER_NUM;
         while (1 == 1)
         {
             if (isReady(required_pid, msg->required_iteration, fd))
