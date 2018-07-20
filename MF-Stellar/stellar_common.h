@@ -42,7 +42,7 @@ using namespace std;
 
 #define LOG_FILE "./rmse_log"
 
-#define ASP_MODE
+#define BSP_MODE
 struct Block
 {
 	int block_id;
