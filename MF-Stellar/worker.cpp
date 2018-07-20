@@ -160,7 +160,7 @@ int main(int argc, const char * argv[])
             }
 
             //SGD
-            //printf("before submf\n");
+            printf("waiting for Paras\n");
             WaitforParas(iter_cnt);
             submf();
             push_block(push_fd, (*Pblock_ptr));
@@ -531,8 +531,11 @@ void recvTd(int recv_thread_id)
     char* dataBuf = NULL;
     size_t data_sz = 0;
     int to_recv_cnt = 0;
+    bool one_p = false;
+    bool one_q = false;
     while (1 == 1)
     {
+
         if (to_recv_cnt > iter_cnt)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -541,6 +544,7 @@ void recvTd(int recv_thread_id)
         struct timeval st, et;
         gettimeofday(&st, 0);
         int ret = -1;
+        printf("send request %d\n", to_recv_cnt );
         // In stellar, we donot need active pull
         ret = sendPullReq(to_recv_cnt, connfd);
 
@@ -577,6 +581,8 @@ void recvTd(int recv_thread_id)
                 Pblocks[pbid].eles[i] = data_eles[i];
             }
             Pblocks[pbid].data_age = pb->data_age;
+
+            one_p = true;
         }
         else
         {
@@ -592,13 +598,20 @@ void recvTd(int recv_thread_id)
                 Qblocks[qbid].eles[i] = data_eles[i];
             }
             Qblocks[qbid].data_age = pb->data_age;
+            one_q = true;
         }
         free(dataBuf);
-        to_recv_cnt++;
+        if (one_p && one_q)
+        {
+            to_recv_cnt++;
+            one_p = false;
+            one_q = false;
+        }
+
 
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        printf("recv  blocks time = %lld\n", mksp);
+        printf("recv  blocks time = %lld bid=%d\n", mksp, pb->block_id);
         hasRecved = true;
     }
 }

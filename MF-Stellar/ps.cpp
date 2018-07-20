@@ -156,11 +156,13 @@ int main(int argc, const char * argv[])
         }
 
         //getchar();
+
         while (recvCount != WORKER_NUM)
         {
             //cout << "RecvCount\t" << recvCount << endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+
         if (iter_t == 0)
         {
             gettimeofday(&beg, 0);
@@ -398,6 +400,7 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
+        printf("[%d] send to worker [%d] pid=%d\n", send_thread_id, msg->worker_id, required_pid  );
         while (1 == 1)
         {
             if (isReady(required_qid, msg->required_iteration, fd))
@@ -409,6 +412,7 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
+        printf("[%d] send to worker [%d] qid=%d\n", send_thread_id, msg->worker_id, required_qid  );
         canSend[send_thread_id] = false;
 
     }
