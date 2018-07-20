@@ -400,7 +400,7 @@ void sendTd(int send_thread_id)
         }
         while (1 == 1)
         {
-            if (isReady(required_qid, msg->required_iteration))
+            if (isReady(required_qid, msg->required_iteration, fd))
             {
                 break;
             }
