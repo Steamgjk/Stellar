@@ -312,7 +312,7 @@ bool isReady(int block_id, int data_age, int fd)
     {
         printf("%d iter can start\n", data_age );
     }
-    getchar();
+    //getchar();
     if (block_id < WORKER_NUM)
     {
         // is P block
