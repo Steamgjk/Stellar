@@ -458,7 +458,7 @@ int push_block(int sendfd, Block& blk)
     memcpy(buf, &(blk), struct_sz);
     memcpy(buf + struct_sz, (char*) & (blk.eles[0]), data_sz);
     size_t total_len = struct_sz + data_sz;
-    printf("total_len=%ld struct_sz=%ld data_sz=%ld  elenum=%d\n", total_len, struct_sz, data_sz, blk.ele_num );
+    //printf("total_len=%ld struct_sz=%ld data_sz=%ld  elenum=%d\n", total_len, struct_sz, data_sz, blk.ele_num );
 
     size_t sent_len = 0;
     size_t remain_len = total_len;
