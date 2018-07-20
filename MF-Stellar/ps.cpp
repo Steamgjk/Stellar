@@ -303,7 +303,7 @@ bool isReady(int block_id, int data_age, int fd)
     {
         // is Q block
         block_id -= WORKER_NUM;
-        printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
+        //printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
         if (Qblocks[block_id].data_age >= data_age)
         {
             int qbid = block_id;
