@@ -220,7 +220,8 @@ void WaitforParas(int cur_iter)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    printf("all get the \n");
+    printf("all get the qbid=%d\n", qbid);
+    printf("qbloc = %p\n",  &(Qblocks[qbid]));
     Qblock_ptr = &(Qblocks[qbid]);
 }
 void LoadData()
