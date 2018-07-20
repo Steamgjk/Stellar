@@ -353,7 +353,7 @@ void CalcUpdt(int td_id)
                     Qblock_ptr->eles[j * K + k] += yita * (error * oldP[i * K + k] - theta * oldQ[j * K + k]);
                     if (Pblock_ptr->eles[i * K + k] > 0.5)
                     {
-                        Pblock_ptr->eles[i * K + k] = 0.5
+                        Pblock_ptr->eles[i * K + k] = 0.5;
                     }
                     if (Pblock_ptr->eles[i * K + k] < -0.5)
                     {
@@ -361,7 +361,7 @@ void CalcUpdt(int td_id)
                     }
                     if (Qblock_ptr->eles[j * K + k] > 0.5)
                     {
-                        Qblock_ptr->eles[j * K + k] = 0.5
+                        Qblock_ptr->eles[j * K + k] = 0.5;
                     }
                     if (Qblock_ptr->eles[j * K + k] < -0.5)
                     {
