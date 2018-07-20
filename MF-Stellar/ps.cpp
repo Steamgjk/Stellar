@@ -305,8 +305,14 @@ bool isReady(int block_id, int data_age, int fd)
     //for BSP constraints
     if (!curIterFin(data_age - 1))
     {
+        printf("%d iter cannot start\n", data_age );
         return false;
     }
+    else
+    {
+        printf("%d iter can start\n", data_age );
+    }
+    getchar();
     if (block_id < WORKER_NUM)
     {
         // is P block
