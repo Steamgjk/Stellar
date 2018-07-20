@@ -309,6 +309,10 @@ bool isReady(int block_id, int data_age, int fd)
         //printf("%d iter cannot start\n", data_age );
         return false;
     }
+    if (iter_t < data_age)
+    {
+        return false;
+    }
     /*
     else
     {
