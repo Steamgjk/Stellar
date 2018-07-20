@@ -38,6 +38,8 @@ float CalcRMSE();
 void LoadTestRating();
 bool isReady(int block_id, int data_age, int send_fd);
 int genActivePushfd(int send_thread_id);
+bool curIterFin(int curIter);
+
 
 int WORKER_NUM = 1;
 char* local_ips[CAP] = {"12.12.10.18", "12.12.10.18", "12.12.10.18", "12.12.10.18"};
@@ -142,19 +144,18 @@ int main(int argc, const char * argv[])
     while (1 == 1)
     {
         srand(time(0));
-        random_shuffle(worker_qidx, worker_qidx + WORKER_NUM); //迭代器
         /*
+        random_shuffle(worker_qidx, worker_qidx + WORKER_NUM); //迭代器
         for (int i = 0; i < WORKER_NUM; i++)
         {
             printf("%d  [%d:%d]\n", i, worker_pidx[i], worker_qidx[i] );
         }
-        **/
+
         printf("[%d]canSend...!\n", iter_t);
         for (int i = 0; i < WORKER_NUM; i++)
         {
             canSend[i] = true;
         }
-
         //getchar();
 
         while (recvCount != WORKER_NUM)
@@ -162,12 +163,17 @@ int main(int argc, const char * argv[])
             //cout << "RecvCount\t" << recvCount << endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-
+        **/
+        if (!curIterFin(iter_cnt))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
         if (iter_t == 0)
         {
             gettimeofday(&beg, 0);
         }
-        if (recvCount == WORKER_NUM)
+        //if (recvCount == WORKER_NUM)
         {
             if (iter_t % 10 == 0 )
             {
@@ -197,7 +203,21 @@ int main(int argc, const char * argv[])
 
     return 0;
 }
-
+bool curIterFin(int curIter)
+{
+    if (curIter < 0)
+    {
+        return true;
+    }
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
+        if (Pblocks[i].data_age <= curIter || Qblocks[i].data_age <= curIter)
+        {
+            return false;
+        }
+    }
+    return true;
+}
 void LoadTestRating()
 {
     vec_mids.clear();
@@ -281,6 +301,12 @@ bool isReady(int block_id, int data_age, int fd)
     size_t data_sz = 0;
     char* buf = NULL;
     bool ready = false;
+
+    //for BSP constraints
+    if (!curIterFin(data_age - 1))
+    {
+        return false;
+    }
     if (block_id < WORKER_NUM)
     {
         // is P block
@@ -427,6 +453,8 @@ void recvTd(int recv_thread_id)
 {
     printf("recv_thread_id=%d\n", recv_thread_id);
     int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
+    bool one_p = false;
+    bool one_q = false;
     while (1 == 1)
     {
         //printf("recving ...\n");
@@ -486,6 +514,7 @@ void recvTd(int recv_thread_id)
                 Pblocks[block_idx].eles[i] += data_eles[i];
             }
             Pblocks[block_idx].data_age++;
+            one_p = true;
         }
         else
         {
@@ -502,16 +531,22 @@ void recvTd(int recv_thread_id)
                 Qblocks[block_idx].eles[i] += data_eles[i];
             }
             Qblocks[block_idx].data_age++;
+            one_q = true;
         }
 
         free(sockBuf);
         free(dataBuf);
 
-
+        if (one_p && one_q)
+        {
+            one_p = false;
+            one_q = false;
+            recvCount++;
+        }
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
         printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
-        recvCount++;
+
     }
 }
 
