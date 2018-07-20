@@ -217,7 +217,7 @@ int main(int argc, const char * argv[])
                     recvCount = 0;
                 }
                 printf("Calclating RMSE... \n");
-                printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", pmin, pmax, qmin, qmax );
+                printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
                 /*
                 float rmse = CalcRMSE();
                 ofs << iter_t << "\t" << rmse << endl;
