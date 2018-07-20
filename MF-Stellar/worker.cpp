@@ -365,6 +365,7 @@ void submf()
     {
         cb_ids.push_back(j);
     }
+    printf("A rb_ids.size=%ld  cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
     random_shuffle(rb_ids.begin(), rb_ids.end()); //迭代器
     random_shuffle(cb_ids.begin(), cb_ids.end()); //迭代器
     /*
