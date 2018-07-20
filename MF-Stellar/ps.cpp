@@ -440,7 +440,7 @@ void recvTd(int recv_thread_id)
             ret = recv(connfd, sockBuf + cur_len, expected_len - cur_len, 0);
             if (ret <=  0)
             {
-                printf("Mimatch! %d\n", ret);
+                printf("[%d] Mimatch! %d\n", recv_thread_id, ret);
                 if (ret == 0)
                 {
                     exit(-1);
