@@ -204,7 +204,6 @@ void LoadTestRating()
     ifstream ifs(TEST_NAME, ios::in | ios::out);
     int user_id, movie_id;
     float rate;
-    int test_cnt = 0;
     while (!ifs.eof())
     {
         ifs >> user_id >> movie_id >> rate;
@@ -381,7 +380,7 @@ int genActivePushfd(int send_thread_id)
 void sendTd(int send_thread_id)
 {
     int fd = genActivePushfd(send_thread_id);
-    char* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
+    ReqMsg* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
     int ret = -1;
     while (1 == 1)
     {
@@ -466,8 +465,8 @@ void recvTd(int recv_thread_id)
         }
 
         float* data_eles = (float*)(void*)dataBuf;
-        int block_id = pb->block_id ;
-        if (block_id < WORKER_NUM)
+        int block_idx = pb->block_id ;
+        if (block_idx < WORKER_NUM)
         {
             //is Pblock
             Pblocks[block_idx].block_id = pb->block_id;
