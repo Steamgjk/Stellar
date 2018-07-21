@@ -43,7 +43,9 @@ using namespace std;
 #define LOG_FILE "./rmse_log"
 
 //#define BSP_MODE
-#define ASP_MODE
+//#define ASP_MODE
+#define SSP_MODE
+#define SSP_BOUND (1)
 struct Block
 {
 	int block_id;
