@@ -556,6 +556,11 @@ void recvTd(int recv_thread_id)
     bool one_q = false;
     while (1 == 1)
     {
+        if (iter_t == iter_thresh)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
         //printf("recving ...\n");
         struct timeval st, et;
         gettimeofday(&st, 0);
