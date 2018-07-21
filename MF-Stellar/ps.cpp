@@ -523,6 +523,30 @@ int genActivePushfd(int send_thread_id)
 }
 //send only establish the fd vec, send in sequence
 
+void ps_push()
+{
+    int fds[100];
+    for (int send_td = 0; send_td < WORKER_NUM; send_td++)
+    {
+        fds[i] = genActivePushfd(send_td);
+        sendConnected[send_td] = true;
+    }
+
+    while (1 == 1)
+    {
+        if (waitfor)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
+        //send qid by priority
+
+        //isReady  round robin
+        //sleep for several ms
+
+
+    }
+}
 //recving request and then decide can/cannot sent
 //corresponding to pull in worker
 void sendTd(int send_thread_id)
@@ -539,12 +563,14 @@ void sendTd(int send_thread_id)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
+        //Stellar does not need this ReqMsg
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
         int required_pid = msg->worker_id;
         int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM + WORKER_NUM;
         printf("[%d]it is asking for %d iter and pid=%d qid=%d\n", send_thread_id, msg->required_iteration, required_pid, required_qid );
         while (1 == 1)
         {
+
             if (isReady(required_pid, msg->required_iteration, fd))
             {
                 break;

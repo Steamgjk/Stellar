@@ -45,7 +45,7 @@ using namespace std;
 //#define BSP_MODE
 //#define ASP_MODE
 #define SSP_MODE
-#define SSP_BOUND (1)
+#define SSP_BOUND (2)
 struct Block
 {
 	int block_id;
