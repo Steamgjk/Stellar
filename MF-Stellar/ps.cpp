@@ -64,6 +64,7 @@ bool sendConnected[100];
 bool recvConnected[100];
 
 int iter_t = 0;
+int iter_thresh = 10;
 
 int main(int argc, const char * argv[])
 {
@@ -205,7 +206,7 @@ int main(int argc, const char * argv[])
         //if (recvCount == WORKER_NUM)
         {
             //if (iter_t % 10 == 0 )
-            if (iter_t == 10)
+            if (iter_t == iter_thresh)
             {
                 gettimeofday(&ed, 0);
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
@@ -505,6 +506,11 @@ void sendTd(int send_thread_id)
     int ret = -1;
     while (1 == 1)
     {
+        if (iter_t == iter_thresh)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
         int required_pid = msg->worker_id;
         int required_qid = (msg->worker_id + msg->required_iteration) % WORKER_NUM + WORKER_NUM;
