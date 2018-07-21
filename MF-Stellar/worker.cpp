@@ -371,6 +371,23 @@ void CalcUpdt(int td_id)
                     if (Pblock_ptr->eles[i * K + k] + 1 == Pblock_ptr->eles[i * K + k] - 1)
                     {
                         printf("p %d q %d  error =%lf rate=%lf i=%d j=%d k=%d rand_idx=%d vale=%f user_id=%d  movie_id=%d  pval=%f  qval=%f\n", p_block_idx, q_block_idx, error, rate, i, j, k, rand_idx,  user_id, movie_id, Pblock_ptr->eles[i * K + k], Qblock_ptr->eles[j * K + k] );
+
+                        if (Pblock_ptr->eles[i * K + k] > 0.5)
+                        {
+                            printf("pval>0.5\n");
+                        }
+                        if (Pblock_ptr->eles[i * K + k] < -0.5)
+                        {
+                            printf("pval<-0.5\n");
+                        }
+                        if (Qblock_ptr->eles[j * K + k] > 0.5)
+                        {
+                            printf("qval>0.5\n");
+                        }
+                        if (Qblock_ptr->eles[j * K + k] < -0.5)
+                        {
+                            printf("pval<-0.5\n");
+                        }
                         getchar();
                     }
                 }
@@ -386,6 +403,29 @@ void submf()
 {
     int pid = Pblock_ptr->block_id;
     int qid = Qblock_ptr->block_id - WORKER_NUM;
+
+    for (int ii = 0; ii < Pblock_ptr->ele_num; ii++)
+    {
+        if (Pblock_ptr->eles[ii] > 0.5)
+        {
+            Pblock_ptr->eles[ii] = 0.5;
+        }
+        if (Pblock_ptr->eles[ii] < -0.5)
+        {
+            Pblock_ptr->eles[ii] = -0.5;
+        }
+    }
+    for (int jj = 0; jj < Qblock_ptr->ele_num; jj++)
+    {
+        if (Qblock_ptr->eles[jj] > 0.5)
+        {
+            Qblock_ptr->eles[jj] = 0.5;
+        }
+        if (Qblock_ptr->eles[jj] < -0.5)
+        {
+            Qblock_ptr->eles[jj] = -0.5;
+        }
+    }
     oldP = Pblock_ptr->eles;
     oldQ = Qblock_ptr->eles;
 
