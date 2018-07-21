@@ -215,7 +215,7 @@ void WaitforParas(int cur_iter)
 #ifdef BSP_MODE
     while (Pblocks[pbid].data_age < cur_iter)
 #endif
-#ifdef ASP_MODE
+#if (defined ASP_MODE) || (defined SSP_MODE)
         while (Pblocks[pbid].data_age < 0)
 #endif
         {
@@ -228,7 +228,7 @@ void WaitforParas(int cur_iter)
 #ifdef BSP_MODE
     while (Qblocks[qbid].data_age < cur_iter)
 #endif
-#ifdef ASP_MODE
+#if (defined ASP_MODE) || (defined SSP_MODE)
         while (Qblocks[qbid].data_age < 0)
 #endif
 
