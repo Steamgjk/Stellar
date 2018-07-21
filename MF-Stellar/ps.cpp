@@ -39,7 +39,7 @@ void LoadTestRating();
 bool isReady(int block_id, int required_iter, int send_fd);
 int genActivePushfd(int send_thread_id);
 bool curIterFin(int curIter);
-
+bool waitfor = false;
 
 int WORKER_NUM = 1;
 char* local_ips[CAP] = {"12.12.10.18", "12.12.10.18", "12.12.10.18", "12.12.10.18"};
@@ -208,6 +208,8 @@ int main(int argc, const char * argv[])
             //if (iter_t % 10 == 0 )
             if (iter_t == iter_thresh)
             {
+                waitfor = true;
+                printf("Entering statistics...\n");
                 gettimeofday(&ed, 0);
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
                 float pmin, pmax, qmin, qmax;
@@ -506,7 +508,7 @@ void sendTd(int send_thread_id)
     int ret = -1;
     while (1 == 1)
     {
-        if (iter_t == iter_thresh)
+        if (waitfor)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
@@ -556,7 +558,7 @@ void recvTd(int recv_thread_id)
     bool one_q = false;
     while (1 == 1)
     {
-        if (iter_t == iter_thresh)
+        if (waitfor)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
