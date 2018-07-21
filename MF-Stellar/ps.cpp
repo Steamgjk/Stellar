@@ -60,6 +60,9 @@ long long time_span[300];
 std::vector<int> vec_uids;
 std::vector<int> vec_mids;
 std::vector<float> vec_rates;
+bool sendConnected[100];
+bool recvConnected[100];
+
 int iter_t = 0;
 
 int main(int argc, const char * argv[])
@@ -85,6 +88,7 @@ int main(int argc, const char * argv[])
 
     for (int recv_thread_id = 0; recv_thread_id < WORKER_NUM; recv_thread_id++)
     {
+        recvConnected[recv_thread_id] = false;
         int thid = recv_thread_id;
         printf("thid=%d\n", thid );
         std::thread recv_thread(recvTd, thid);
@@ -92,12 +96,27 @@ int main(int argc, const char * argv[])
     }
     for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
     {
+        sendConnected[send_thread_id] = false;
         int thid = send_thread_id;
         std::thread send_thread(sendTd, thid);
         send_thread.detach();
     }
-    printf("wait for 3s\n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+    while (1 == 1)
+    {
+        bool ok = true;
+        for (int i = 0; i < WORKER_NUM; i++)
+        {
+            if (sendConnected[i] == false || recvConnected[i] == false)
+            {
+                ok = false;
+            }
+        }
+        if (ok)
+        {
+            break;
+        }
+    }
     srand(1);
 
 
@@ -472,6 +491,8 @@ int genActivePushfd(int send_thread_id)
 void sendTd(int send_thread_id)
 {
     int fd = genActivePushfd(send_thread_id);
+    sendConnected[send_thread_id] = true;
+
     ReqMsg* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
     int ret = -1;
     while (1 == 1)
@@ -516,6 +537,7 @@ void recvTd(int recv_thread_id)
 {
     printf("recv_thread_id=%d\n", recv_thread_id);
     int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
+    recvConnected[recv_thread_id] = true;
     bool one_p = false;
     bool one_q = false;
     while (1 == 1)
