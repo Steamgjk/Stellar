@@ -478,8 +478,9 @@ void submf()
         if (Pblock_ptr->eles[i] > 0.5)
         {
             printf("pval>0.5\n");
+            getchar();
         }
-        getchar();
+
         Pblock_ptr->eles[i] -= oldP[i];
     }
     for (size_t i = 0; i < oldQ.size(); i++)
