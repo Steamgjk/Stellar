@@ -205,8 +205,8 @@ int main(int argc, const char * argv[])
         printf("RMSE-thd iter_t=%d\n", iter_t );
         //if (recvCount == WORKER_NUM)
         {
-            //if (iter_t % 10 == 0 )
-            if (iter_t == iter_thresh)
+            if (iter_t % 10 == 0 )
+                //if (iter_t == iter_thresh)
             {
                 waitfor = true;
                 printf("Entering statistics...\n");
@@ -251,7 +251,8 @@ int main(int argc, const char * argv[])
                 float rmse = CalcRMSE();
                 //ofs << iter_t << "\t" << rmse << endl;
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
-                exit(0);
+                waitfor = false;
+                //exit(0);
 
             }
 
