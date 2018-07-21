@@ -370,7 +370,7 @@ void CalcUpdt(int td_id)
 
                     if (Pblock_ptr->eles[i * K + k] + 1 == Pblock_ptr->eles[i * K + k] - 1)
                     {
-                        printf("p %d q %d  error =%lf i=%d j=%d k=%d rand_idx=%d vale=%f user_id=%d  movie_id=%d\n", p_block_idx, q_block_idx, error, i, j, k, rand_idx,  rate, user_id, movie_id );
+                        printf("p %d q %d  error =%lf rate=%lf i=%d j=%d k=%d rand_idx=%d vale=%f user_id=%d  movie_id=%d  pval=%f  qval=%f\n", p_block_idx, q_block_idx, error, rate, i, j, k, rand_idx,  user_id, movie_id, Pblock_ptr->eles[i * K + k], Qblock_ptr->eles[j * K + k] );
                         getchar();
                     }
                 }
