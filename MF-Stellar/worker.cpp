@@ -324,7 +324,7 @@ void CalcUpdt(int td_id)
             int p_block_idx = rb_ids[td_id];
             int q_block_idx = cb_ids[td_id];
             size_t block_sz = entry_vec[p_block_idx][q_block_idx].size();
-            //printf("CalcUpdt[%d] pid=%d qid=%d block_sz=%ld\n", td_id, p_block_idx, q_block_idx, block_sz );
+            printf("CalcUpdt[%d] pid=%d qid=%d block_sz=%ld\n", td_id, p_block_idx, q_block_idx, block_sz );
 
             if (block_sz == 0)
             {
@@ -356,30 +356,21 @@ void CalcUpdt(int td_id)
                 {
                     Pblock_ptr->eles[i * K + k] += yita * (error * oldQ[j * K + k] - theta * oldP[i * K + k]);
                     Qblock_ptr->eles[j * K + k] += yita * (error * oldP[i * K + k] - theta * oldQ[j * K + k]);
-                    if (Pblock_ptr->eles[i * K + k] > 0.5)
-                    {
-                        Pblock_ptr->eles[i * K + k] = 0.5;
-                    }
-                    if (Pblock_ptr->eles[i * K + k] < -0.5)
-                    {
-                        Pblock_ptr->eles[i * K + k] = -0.5;
-                    }
-                    if (Qblock_ptr->eles[j * K + k] > 0.5)
-                    {
-                        Qblock_ptr->eles[j * K + k] = 0.5;
-                    }
-                    if (Qblock_ptr->eles[j * K + k] < -0.5)
-                    {
-                        Qblock_ptr->eles[j * K + k] = -0.5;
-                    }
+
+                    Pblock_ptr->eles[i * K + k] = (Pblock_ptr->eles[i * K + k] > 0.5) ? (0.5) : (Pblock_ptr->eles[i * K + k]);
+                    Pblock_ptr->eles[i * K + k] = (Pblock_ptr->eles[i * K + k] < -0.5) ? (-0.5) : (Pblock_ptr->eles[i * K + k]);
+
+                    Qblock_ptr->eles[j * K + k] = (Qblock_ptr->eles[j * K + k] > 0.5) ? (0.5) : (Qblock_ptr->eles[j * K + k]);
+                    Qblock_ptr->eles[j * K + k] = (Qblock_ptr->eles[j * K + k] < -0.5) ? (-0.5) : (Qblock_ptr->eles[j * K + k]);
+
 
                     if (Pblock_ptr->eles[i * K + k] + 1 == Pblock_ptr->eles[i * K + k] - 1)
                     {
-                        printf("p %d q %d  error =%lf rate=%lf i=%d j=%d k=%d rand_idx=%d vale=%f user_id=%d  movie_id=%d  pval=%f  qval=%f\n", p_block_idx, q_block_idx, error, rate, i, j, k, rand_idx,  user_id, movie_id, Pblock_ptr->eles[i * K + k], Qblock_ptr->eles[j * K + k] );
+                        //printf("p %d q %d  error =%lf rate=%lf i=%d j=%d k=%d rand_idx=%d user_id=%d  movie_id=%d  pval=%f  qval=%f\n", p_block_idx, q_block_idx, error, rate, i, j, k, rand_idx,  user_id, movie_id, Pblock_ptr->eles[i * K + k], Qblock_ptr->eles[j * K + k] );
 
                         if (Pblock_ptr->eles[i * K + k] > 0.5)
                         {
-                            printf("pval>0.5\n");
+                            printf("pval>0.5  pval=%f\n", Pblock_ptr->eles[i * K + k]);
                         }
                         if (Pblock_ptr->eles[i * K + k] < -0.5)
                         {
@@ -448,12 +439,12 @@ void submf()
     //printf("A rb_ids.size=%ld  cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
     random_shuffle(rb_ids.begin(), rb_ids.end()); //迭代器
     random_shuffle(cb_ids.begin(), cb_ids.end()); //迭代器
-    /*
+
     for (size_t i = 0; i < rb_ids.size(); i++)
     {
         printf("%d %d\n", rb_ids[i], cb_ids[i]);
     }
-    **/
+
     struct timeval beg, ed;
     long long mksp;
     gettimeofday(&beg, 0);
