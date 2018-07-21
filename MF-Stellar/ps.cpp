@@ -402,8 +402,15 @@ bool isReady(int block_id, int required_iter, int fd)
             int pbid = block_id;
             data_sz = sizeof(float) * Pblocks[pbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
+            while (!mtxes[block_id].try_lock())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
             memcpy(buf, &(Pblocks[pbid]), struct_sz);
             memcpy(buf + struct_sz, (char*) & (Pblocks[pbid].eles[0]), data_sz);
+            mtxes[block_id].unlock();
+
+
             ready = true;
         }
 #ifdef BSP_MODE
@@ -416,17 +423,22 @@ bool isReady(int block_id, int required_iter, int fd)
     else
     {
         // is Q block
-        block_id -= WORKER_NUM;
         //printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
 #ifdef BSP_MODE
         if (Qblocks[block_id].data_age >= required_iter)
 #endif
         {
-            int qbid = block_id;
+            int qbid = block_id - WORKER_NUM;
             data_sz = sizeof(float) * Qblocks[qbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
+            while (!mtxes[block_id].try_lock())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
             memcpy(buf, &(Qblocks[qbid]), struct_sz);
             memcpy(buf + struct_sz , (char*) & (Qblocks[qbid].eles[0]), data_sz);
+            mtxes[block_id].unlock();
+
             ready = true;
         }
 #ifdef BSP_MODE
@@ -623,9 +635,10 @@ void recvTd(int recv_thread_id)
             float pmax = -1;
             for (int i = 0; i < pb->ele_num; i++)
             {
-                //Pblocks[block_idx].eles[i] += data_eles[i];
+                Pblocks[block_idx].eles[i] += data_eles[i];
                 //Pblocks[block_idx].eles[i] = data_eles[i];
-                //Pblocks[block_idx].eles[i] = (Pblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Pblocks[block_idx].eles[i]);
+                Pblocks[block_idx].eles[i] = (Pblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Pblocks[block_idx].eles[i]);
+
                 if (pmin > data_eles[i])
                 {
                     pmin = data_eles[i];
@@ -660,9 +673,10 @@ void recvTd(int recv_thread_id)
             float qmax = -1;
             for (int i = 0; i < pb->ele_num; i++)
             {
-                //Qblocks[block_idx].eles[i] += data_eles[i];
+                Qblocks[block_idx].eles[i] += data_eles[i];
                 //Qblocks[block_idx].eles[i] = data_eles[i];
-                //Qblocks[block_idx].eles[i] = (Qblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Qblocks[block_idx].eles[i]);
+                Qblocks[block_idx].eles[i] = (Qblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Qblocks[block_idx].eles[i]);
+
                 if (qmin > data_eles[i])
                 {
                     qmin = data_eles[i];
@@ -671,6 +685,7 @@ void recvTd(int recv_thread_id)
                 {
                     qmax = data_eles[i];
                 }
+
             }
             printf("qmin=%f qmax=%f\n", qmin, qmax );
             Qblocks[block_idx].data_age++;
