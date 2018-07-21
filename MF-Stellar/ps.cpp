@@ -403,17 +403,17 @@ bool isReady(int block_id, int required_iter, int fd)
 
             data_sz = sizeof(float) * Pblocks[pbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
-
+#ifdef ASP_MODE
             while (!mtxes[block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-
+#endif
             memcpy(buf, &(Pblocks[pbid]), struct_sz);
             memcpy(buf + struct_sz, (char*) & (Pblocks[pbid].eles[0]), data_sz);
-
+#ifdef ASP_MODE
             mtxes[block_id].unlock();
-
+#endif
 
             ready = true;
         }
@@ -435,17 +435,17 @@ bool isReady(int block_id, int required_iter, int fd)
         {
             data_sz = sizeof(float) * Qblocks[qbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
-
+#ifdef ASP_MODE
             while (!mtxes[block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-
+#endif
             memcpy(buf, &(Qblocks[qbid]), struct_sz);
             memcpy(buf + struct_sz , (char*) & (Qblocks[qbid].eles[0]), data_sz);
-
+#ifdef ASP_MODE
             mtxes[block_id].unlock();
-
+#endif
             ready = true;
         }
 #ifdef BSP_MODE
@@ -626,12 +626,12 @@ void recvTd(int recv_thread_id)
         int block_idx = pb->block_id ;
         if (block_idx < WORKER_NUM)
         {
-
+#ifdef ASP_MODE
             while (!mtxes[pb->block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-
+#endif
             //is Pblock
             Pblocks[block_idx].block_id = pb->block_id;
             Pblocks[block_idx].sta_idx = pb->sta_idx;
@@ -659,18 +659,19 @@ void recvTd(int recv_thread_id)
             }
             printf("pmin=%f pmax=%f\n", pmin, pmax );
             Pblocks[block_idx].data_age++;
+#ifdef ASP_MODE
             mtxes[pb->block_id].unlock();
-
+#endif
             one_p = true;
         }
         else
         {
-
+#ifdef ASP_MODE
             while (!mtxes[pb->block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-
+#endif
             // is Qblock
             block_idx -= WORKER_NUM;
             Qblocks[block_idx].block_id = pb->block_id;
@@ -700,8 +701,9 @@ void recvTd(int recv_thread_id)
             }
             printf("qmin=%f qmax=%f\n", qmin, qmax );
             Qblocks[block_idx].data_age++;
-
+#ifdef ASP_MODE
             mtxes[pb->block_id].unlock();
+#endif
             one_q = true;
         }
 
