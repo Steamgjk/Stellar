@@ -101,29 +101,30 @@ int main(int argc, const char * argv[])
         std::thread send_thread(sendTd, thid);
         send_thread.detach();
     }
-
-    while (1 == 1)
-    {
-        bool ok = true;
-        for (int i = 0; i < WORKER_NUM; i++)
+    /*
+        while (1 == 1)
         {
-            if (sendConnected[i] == false)
+            bool ok = true;
+            for (int i = 0; i < WORKER_NUM; i++)
             {
-                printf("%d send not connected\n", i );
-                ok = false;
+                if (sendConnected[i] == false)
+                {
+                    printf("%d send not connected\n", i );
+                    ok = false;
+                }
+                if (recvConnected[i] == false)
+                {
+                    printf("%d recv not connected\n", i );
+                    ok = false;
+                }
             }
-            if (recvConnected[i] == false)
+            if (ok)
             {
-                printf("%d recv not connected\n", i );
-                ok = false;
+                break;
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(3000));
         }
-        if (ok)
-        {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    }
+    **/
     srand(1);
 
 
