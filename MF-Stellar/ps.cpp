@@ -619,12 +619,23 @@ void recvTd(int recv_thread_id)
             Pblocks[block_idx].eles.resize(pb->ele_num);
             Pblocks[block_idx].isP = pb->isP;
 
+            float pmin = 99999;
+            float pmax = -1;
             for (int i = 0; i < pb->ele_num; i++)
             {
                 //Pblocks[block_idx].eles[i] += data_eles[i];
                 //Pblocks[block_idx].eles[i] = data_eles[i];
                 //Pblocks[block_idx].eles[i] = (Pblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Pblocks[block_idx].eles[i]);
+                if (pmin > data_eles[i])
+                {
+                    pmin = data_eles[i];
+                }
+                if (pmax < data_eles[i])
+                {
+                    pmax = data_eles[i];
+                }
             }
+            printf("pmin=%f pmax=%f\n", pmin, pmax );
             Pblocks[block_idx].data_age++;
             mtxes[pb->block_id].unlock();
 
@@ -644,12 +655,24 @@ void recvTd(int recv_thread_id)
             Qblocks[block_idx].ele_num = pb->ele_num;
             Qblocks[block_idx].eles.resize(pb->ele_num);
             Qblocks[block_idx].isP = pb->isP;
+
+            float qmin = 99999;
+            float qmax = -1;
             for (int i = 0; i < pb->ele_num; i++)
             {
                 //Qblocks[block_idx].eles[i] += data_eles[i];
                 //Qblocks[block_idx].eles[i] = data_eles[i];
                 //Qblocks[block_idx].eles[i] = (Qblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Qblocks[block_idx].eles[i]);
+                if (qmin > data_eles[i])
+                {
+                    qmin = data_eles[i];
+                }
+                if (qmax < data_eles[i])
+                {
+                    qmax = data_eles[i];
+                }
             }
+            printf("qmin=%f qmax=%f\n", qmin, qmax );
             Qblocks[block_idx].data_age++;
 
             mtxes[pb->block_id].unlock();
