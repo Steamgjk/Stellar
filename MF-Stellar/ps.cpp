@@ -265,10 +265,7 @@ int main(int argc, const char * argv[])
             }
 
         }
-        if (iter_t == 1200)
-        {
-            exit(0);
-        }
+
     }
     return 0;
 }
