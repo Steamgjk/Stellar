@@ -478,7 +478,7 @@ void submf()
 
         Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] > 0.5) ? (0.2) : (Pblock_ptr->eles[i]);
         Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] < -0.5) ? (0) : (Pblock_ptr->eles[i]);
-        Pblock_ptr->eles[i] -= oldP[i];
+        //Pblock_ptr->eles[i] -= oldP[i];
 
 
     }
@@ -486,7 +486,7 @@ void submf()
     {
         Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] > 0.5) ? (0.2) : (Qblock_ptr->eles[i]);
         Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] < -0.5) ? (0) : (Qblock_ptr->eles[i]);
-        Qblock_ptr->eles[i] -= oldQ[i];
+        //Qblock_ptr->eles[i] -= oldQ[i];
 
     }
     gettimeofday(&ed, 0);

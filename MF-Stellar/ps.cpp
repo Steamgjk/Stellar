@@ -614,7 +614,8 @@ void recvTd(int recv_thread_id)
             Pblocks[block_idx].isP = pb->isP;
             for (int i = 0; i < pb->ele_num; i++)
             {
-                Pblocks[block_idx].eles[i] += data_eles[i];
+                //Pblocks[block_idx].eles[i] += data_eles[i];
+                Pblocks[block_idx].eles[i] = data_eles[i];
             }
             Pblocks[block_idx].data_age++;
             one_p = true;
@@ -631,7 +632,8 @@ void recvTd(int recv_thread_id)
             Qblocks[block_idx].isP = pb->isP;
             for (int i = 0; i < pb->ele_num; i++)
             {
-                Qblocks[block_idx].eles[i] += data_eles[i];
+                //Qblocks[block_idx].eles[i] += data_eles[i];
+                Qblocks[block_idx].eles[i] = data_eles[i];
             }
             Qblocks[block_idx].data_age++;
             one_q = true;
