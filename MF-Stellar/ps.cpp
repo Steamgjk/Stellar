@@ -433,7 +433,6 @@ bool isReady(int block_id, int required_iter, int fd)
         if (Qblocks[qbid].data_age >= required_iter)
 #endif
         {
-
             data_sz = sizeof(float) * Qblocks[qbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
 
