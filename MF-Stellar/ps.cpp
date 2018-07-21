@@ -394,12 +394,13 @@ bool isReady(int block_id, int required_iter, int fd)
     if (block_id < WORKER_NUM)
     {
         // is P block
+        int pbid = block_id;
 #ifdef BSP_MODE
-        if (Pblocks[block_id].data_age >= required_iter)
+        if (Pblocks[pbid].data_age >= required_iter)
 #endif
         {
             //is P block
-            int pbid = block_id;
+
             data_sz = sizeof(float) * Pblocks[pbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
             /*
@@ -426,12 +427,13 @@ bool isReady(int block_id, int required_iter, int fd)
     else
     {
         // is Q block
-        printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
+        //printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
+        int qbid = block_id - WORKER_NUM;
 #ifdef BSP_MODE
-        if (Qblocks[block_id].data_age >= required_iter)
+        if (Qblocks[qbid].data_age >= required_iter)
 #endif
         {
-            int qbid = block_id - WORKER_NUM;
+
             data_sz = sizeof(float) * Qblocks[qbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
             /*
