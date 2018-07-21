@@ -178,7 +178,7 @@ int main(int argc, const char * argv[])
         //if (recvCount == WORKER_NUM)
         {
             //if (iter_t % 10 == 0 )
-            if (iter_t == 100)
+            if (iter_t == 10)
             {
                 gettimeofday(&ed, 0);
                 time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
@@ -218,12 +218,10 @@ int main(int argc, const char * argv[])
                     recvCount = 0;
                 }
                 printf("Calclating RMSE... \n");
-
-                /*
                 float rmse = CalcRMSE();
-                ofs << iter_t << "\t" << rmse << endl;
+                //ofs << iter_t << "\t" << rmse << endl;
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
-                **/
+                exit(0);
 
             }
 

@@ -475,6 +475,8 @@ void submf()
     //Only send Updates
     for (size_t i = 0; i < oldP.size(); i++)
     {
+
+        Pblock_ptr->eles[i] -= oldP[i];
         if (Pblock_ptr->eles[i] > 0.5)
         {
             Pblock_ptr->eles[i] = 0.5;
@@ -484,15 +486,10 @@ void submf()
             Pblock_ptr->eles[i] = -0.5;
         }
 
-        Pblock_ptr->eles[i] -= oldP[i];
-        if (oldP[i] > 0.5)
-        {
-            printf("oldP i=%d val=%f\n", i, oldP[i] );
-            getchar();
-        }
     }
     for (size_t i = 0; i < oldQ.size(); i++)
     {
+        Qblock_ptr->eles[i] -= oldQ[i];
         if (Qblock_ptr->eles[i] > 0.5)
         {
             Qblock_ptr->eles[i] = 0.5;
@@ -501,7 +498,6 @@ void submf()
         {
             Qblock_ptr->eles[i] = -0.5;
         }
-        Qblock_ptr->eles[i] -= oldQ[i];
     }
     gettimeofday(&ed, 0);
     mksp = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
