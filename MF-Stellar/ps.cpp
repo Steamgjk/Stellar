@@ -637,7 +637,7 @@ void recvTd(int recv_thread_id)
             {
                 Pblocks[block_idx].eles[i] += data_eles[i];
                 //Pblocks[block_idx].eles[i] = data_eles[i];
-                Pblocks[block_idx].eles[i] = (Pblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Pblocks[block_idx].eles[i]);
+                Pblocks[block_idx].eles[i] = (Pblocks[block_idx].eles[i] > 0.25) ? (0.25) : (Pblocks[block_idx].eles[i]);
 
                 if (pmin > data_eles[i])
                 {
@@ -675,7 +675,7 @@ void recvTd(int recv_thread_id)
             {
                 Qblocks[block_idx].eles[i] += data_eles[i];
                 //Qblocks[block_idx].eles[i] = data_eles[i];
-                Qblocks[block_idx].eles[i] = (Qblocks[block_idx].eles[i] > 0.5) ? (0.2) : (Qblocks[block_idx].eles[i]);
+                Qblocks[block_idx].eles[i] = (Qblocks[block_idx].eles[i] > 0.25) ? (0.25) : (Qblocks[block_idx].eles[i]);
 
                 if (qmin > data_eles[i])
                 {
