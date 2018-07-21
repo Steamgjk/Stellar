@@ -215,12 +215,15 @@ void WaitforParas(int cur_iter)
 #ifdef BSP_MODE
     while (Pblocks[pbid].data_age < cur_iter)
 #endif
-#if (defined ASP_MODE) || (defined SSP_MODE)
-        while (Pblocks[pbid].data_age < 0)
+#ifdef SSP_MODE
+        while (Pblocks[pbid].data_age < cur_iter - SSP_BOUND)
 #endif
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+#ifdef ASP_MODE
+            while (Pblocks[pbid].data_age < 0)
+#endif
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
 
 
     Pblock_ptr = &(Pblocks[pbid]);
@@ -228,13 +231,16 @@ void WaitforParas(int cur_iter)
 #ifdef BSP_MODE
     while (Qblocks[qbid].data_age < cur_iter)
 #endif
-#if (defined ASP_MODE) || (defined SSP_MODE)
-        while (Qblocks[qbid].data_age < 0)
+#ifdef SSP_MODE
+        while (Qblocks[qbid].data_age < cur_iter - SSP_BOUND)
+#endif
+#ifdef ASP_MODE
+            while (Qblocks[qbid].data_age < 0)
 #endif
 
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
 
 
 
