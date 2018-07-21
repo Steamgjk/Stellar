@@ -363,14 +363,14 @@ void CalcUpdt(int td_id)
                     Qblock_ptr->eles[j * K + k] = (Qblock_ptr->eles[j * K + k] > 0.5) ? (0.5) : (Qblock_ptr->eles[j * K + k]);
                     Qblock_ptr->eles[j * K + k] = (Qblock_ptr->eles[j * K + k] < -0.5) ? (-0.5) : (Qblock_ptr->eles[j * K + k]);
 
-
+                    float tmp = Pblock_ptr->eles[i * K + k];
                     if (Pblock_ptr->eles[i * K + k] + 1 == Pblock_ptr->eles[i * K + k] - 1)
                     {
                         //printf("p %d q %d  error =%lf rate=%lf i=%d j=%d k=%d rand_idx=%d user_id=%d  movie_id=%d  pval=%f  qval=%f\n", p_block_idx, q_block_idx, error, rate, i, j, k, rand_idx,  user_id, movie_id, Pblock_ptr->eles[i * K + k], Qblock_ptr->eles[j * K + k] );
 
                         if (Pblock_ptr->eles[i * K + k] > 0.5)
                         {
-                            printf("pval>0.5  pval=%f\n", Pblock_ptr->eles[i * K + k]);
+                            printf("pval>0.5  pval=%f  tmp=%f\n", Pblock_ptr->eles[i * K + k], tmp);
                         }
                         if (Pblock_ptr->eles[i * K + k] < -0.5)
                         {
