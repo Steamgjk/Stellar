@@ -211,7 +211,7 @@ void WaitforParas(int cur_iter)
 {
     int pbid = thread_id;
     int qbid = (thread_id + cur_iter) % WORKER_NUM;
-    //printf("waiting for pid=%d\n", pbid );
+    printf("waiting for pid=%d  data-age=%d  cur_iter=%d\n", pbid, Pblocks[pbid].data_age, cur_iter  );
 #ifdef BSP_MODE
     while (Pblocks[pbid].data_age < cur_iter)
 #endif
@@ -227,7 +227,7 @@ void WaitforParas(int cur_iter)
 
 
     Pblock_ptr = &(Pblocks[pbid]);
-    //printf("waiting for qid=%d\n", qbid );
+    printf("waiting for qid=%d  data-age =%d  cur_iter=%d\n", qbid, Qblocks[qbid].data_age, cur_iter );
 #ifdef BSP_MODE
     while (Qblocks[qbid].data_age < cur_iter)
 #endif
