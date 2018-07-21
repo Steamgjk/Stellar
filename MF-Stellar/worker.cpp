@@ -477,14 +477,30 @@ void submf()
     {
         if (Pblock_ptr->eles[i] > 0.5)
         {
-            printf("pval>0.5\n");
-            getchar();
+            Pblock_ptr->eles[i] = 0.5;
+        }
+        if (Pblock_ptr->eles[i] < -0.5)
+        {
+            Pblock_ptr->eles[i] = -0.5;
         }
 
         Pblock_ptr->eles[i] -= oldP[i];
+        if (oldP[i] > 0.5)
+        {
+            printf("oldP i=%d val=%f\n", i, oldP[i] );
+            getchar();
+        }
     }
     for (size_t i = 0; i < oldQ.size(); i++)
     {
+        if (Qblock_ptr->eles[i] > 0.5)
+        {
+            Qblock_ptr->eles[i] = 0.5;
+        }
+        if (Qblock_ptr->eles[i] < -0.5)
+        {
+            Qblock_ptr->eles[i] = -0.5;
+        }
         Qblock_ptr->eles[i] -= oldQ[i];
     }
     gettimeofday(&ed, 0);
