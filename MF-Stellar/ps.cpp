@@ -426,7 +426,7 @@ bool isReady(int block_id, int required_iter, int fd)
     else
     {
         // is Q block
-        //printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
+        printf("Q real blockid =%d age1=%d age2=%d\n", block_id, Qblocks[block_id].data_age, data_age  );
 #ifdef BSP_MODE
         if (Qblocks[block_id].data_age >= required_iter)
 #endif
@@ -557,7 +557,7 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-        //printf("[%d] iter=%d send to worker [%d] qid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_qid  );
+        printf("[%d] iter=%d send to worker [%d] qid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_qid  );
         //canSend[send_thread_id] = false;
 
     }
