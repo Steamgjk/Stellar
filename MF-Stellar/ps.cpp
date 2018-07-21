@@ -249,7 +249,7 @@ int main(int argc, const char * argv[])
                 }
                 printf("Calclating RMSE... \n");
                 float rmse = CalcRMSE();
-                //ofs << iter_t << "\t" << rmse << endl;
+                ofs << iter_t << "\t" << rmse << endl;
                 printf("time= %d\t%lld rmse=%f\n", iter_t, time_span[iter_t / 10], rmse );
                 waitfor = false;
                 //exit(0);
