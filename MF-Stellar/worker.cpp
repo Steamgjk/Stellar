@@ -476,28 +476,18 @@ void submf()
     for (size_t i = 0; i < oldP.size(); i++)
     {
 
+        Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] > 0.5) ? (0.2) : (Pblock_ptr->eles[i]);
+        Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] < -0.5) ? (0) : (Pblock_ptr->eles[i]);
         Pblock_ptr->eles[i] -= oldP[i];
-        if (Pblock_ptr->eles[i] > 0.5)
-        {
-            Pblock_ptr->eles[i] = 0.5;
-        }
-        if (Pblock_ptr->eles[i] < -0.5)
-        {
-            Pblock_ptr->eles[i] = -0.5;
-        }
+
 
     }
     for (size_t i = 0; i < oldQ.size(); i++)
     {
+        Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] > 0.5) ? (0.2) : (Qblock_ptr->eles[i]);
+        Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] < -0.5) ? (0) : (Qblock_ptr->eles[i]);
         Qblock_ptr->eles[i] -= oldQ[i];
-        if (Qblock_ptr->eles[i] > 0.5)
-        {
-            Qblock_ptr->eles[i] = 0.5;
-        }
-        if (Qblock_ptr->eles[i] < -0.5)
-        {
-            Qblock_ptr->eles[i] = -0.5;
-        }
+
     }
     gettimeofday(&ed, 0);
     mksp = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
