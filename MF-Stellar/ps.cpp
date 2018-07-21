@@ -62,6 +62,7 @@ std::vector<int> vec_mids;
 std::vector<float> vec_rates;
 bool sendConnected[100];
 bool recvConnected[100];
+std::mutex mtxes[100];
 
 int iter_t = 0;
 int iter_thresh = 10;
@@ -606,6 +607,10 @@ void recvTd(int recv_thread_id)
         int block_idx = pb->block_id ;
         if (block_idx < WORKER_NUM)
         {
+            while (!mtxes[pb->block_id].try_lock())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
             //is Pblock
             Pblocks[block_idx].block_id = pb->block_id;
             Pblocks[block_idx].sta_idx = pb->sta_idx;
@@ -613,16 +618,23 @@ void recvTd(int recv_thread_id)
             Pblocks[block_idx].ele_num = pb->ele_num;
             Pblocks[block_idx].eles.resize(pb->ele_num);
             Pblocks[block_idx].isP = pb->isP;
+
             for (int i = 0; i < pb->ele_num; i++)
             {
-                //Pblocks[block_idx].eles[i] += data_eles[i];
-                Pblocks[block_idx].eles[i] = data_eles[i];
+                Pblocks[block_idx].eles[i] += data_eles[i];
+                //Pblocks[block_idx].eles[i] = data_eles[i];
             }
             Pblocks[block_idx].data_age++;
+            mtxes[pb->block_id].unlock();
+
             one_p = true;
         }
         else
         {
+            while (!mtxes[pb->block_id].try_lock())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
             // is Qblock
             block_idx -= WORKER_NUM;
             Qblocks[block_idx].block_id = pb->block_id;
@@ -633,10 +645,12 @@ void recvTd(int recv_thread_id)
             Qblocks[block_idx].isP = pb->isP;
             for (int i = 0; i < pb->ele_num; i++)
             {
-                //Qblocks[block_idx].eles[i] += data_eles[i];
-                Qblocks[block_idx].eles[i] = data_eles[i];
+                Qblocks[block_idx].eles[i] += data_eles[i];
+                //Qblocks[block_idx].eles[i] = data_eles[i];
             }
             Qblocks[block_idx].data_age++;
+
+            mtxes[pb->block_id].unlock();
             one_q = true;
         }
 
