@@ -344,6 +344,11 @@ void CalcUpdt(int td_id)
 
                 for (int k = 0; k < K; ++k)
                 {
+
+                    oldP[i * K + k] = (oldP[i * K + k] > 0.5) ? (0.5) : (oldP[i * K + k]);
+                    oldP[i * K + k] = (oldP[i * K + k] < -0.5) ? (-0.5) : (oldP[i * K + k]);
+                    oldQ[j * K + k] = (oldQ[j * K + k] > 0.5) ? (0.5) : (oldQ[j * K + k]);
+                    oldQ[j * K + k] = (oldQ[j * K + k] < -0.5) ? (-0.5) : (oldQ[j * K + k]);
                     error -= oldP[i * K + k] * oldQ[j * K + k];
                 }
 
@@ -403,29 +408,30 @@ void submf()
 {
     int pid = Pblock_ptr->block_id;
     int qid = Qblock_ptr->block_id - WORKER_NUM;
-
-    for (int ii = 0; ii < Pblock_ptr->ele_num; ii++)
-    {
-        if (Pblock_ptr->eles[ii] > 0.5)
+    /*
+        for (int ii = 0; ii < Pblock_ptr->ele_num; ii++)
         {
-            Pblock_ptr->eles[ii] = 0.5;
+            if (Pblock_ptr->eles[ii] > 0.5)
+            {
+                Pblock_ptr->eles[ii] = 0.5;
+            }
+            if (Pblock_ptr->eles[ii] < -0.5)
+            {
+                Pblock_ptr->eles[ii] = -0.5;
+            }
         }
-        if (Pblock_ptr->eles[ii] < -0.5)
+        for (int jj = 0; jj < Qblock_ptr->ele_num; jj++)
         {
-            Pblock_ptr->eles[ii] = -0.5;
+            if (Qblock_ptr->eles[jj] > 0.5)
+            {
+                Qblock_ptr->eles[jj] = 0.5;
+            }
+            if (Qblock_ptr->eles[jj] < -0.5)
+            {
+                Qblock_ptr->eles[jj] = -0.5;
+            }
         }
-    }
-    for (int jj = 0; jj < Qblock_ptr->ele_num; jj++)
-    {
-        if (Qblock_ptr->eles[jj] > 0.5)
-        {
-            Qblock_ptr->eles[jj] = 0.5;
-        }
-        if (Qblock_ptr->eles[jj] < -0.5)
-        {
-            Qblock_ptr->eles[jj] = -0.5;
-        }
-    }
+        **/
     oldP = Pblock_ptr->eles;
     oldQ = Qblock_ptr->eles;
 
