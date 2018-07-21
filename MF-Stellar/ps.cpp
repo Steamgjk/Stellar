@@ -107,8 +107,14 @@ int main(int argc, const char * argv[])
         bool ok = true;
         for (int i = 0; i < WORKER_NUM; i++)
         {
-            if (sendConnected[i] == false || recvConnected[i] == false)
+            if (sendConnected[i] == false)
             {
+                printf("%d send not connected\n", i );
+                ok = false;
+            }
+            if (recvConnected[i] == false)
+            {
+                printf("%d recv not connected\n", i );
                 ok = false;
             }
         }
