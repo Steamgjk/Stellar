@@ -403,16 +403,16 @@ bool isReady(int block_id, int required_iter, int fd)
 
             data_sz = sizeof(float) * Pblocks[pbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
-            /*
+
             while (!mtxes[block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-            **/
+
             memcpy(buf, &(Pblocks[pbid]), struct_sz);
             memcpy(buf + struct_sz, (char*) & (Pblocks[pbid].eles[0]), data_sz);
 
-            //mtxes[block_id].unlock();
+            mtxes[block_id].unlock();
 
 
             ready = true;
@@ -436,16 +436,16 @@ bool isReady(int block_id, int required_iter, int fd)
 
             data_sz = sizeof(float) * Qblocks[qbid].eles.size();
             buf = (char*)malloc(struct_sz + data_sz);
-            /*
+
             while (!mtxes[block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-            **/
+
             memcpy(buf, &(Qblocks[qbid]), struct_sz);
             memcpy(buf + struct_sz , (char*) & (Qblocks[qbid].eles[0]), data_sz);
 
-            //mtxes[block_id].unlock();
+            mtxes[block_id].unlock();
 
             ready = true;
         }
@@ -627,12 +627,12 @@ void recvTd(int recv_thread_id)
         int block_idx = pb->block_id ;
         if (block_idx < WORKER_NUM)
         {
-            /*
+
             while (!mtxes[pb->block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-            **/
+
             //is Pblock
             Pblocks[block_idx].block_id = pb->block_id;
             Pblocks[block_idx].sta_idx = pb->sta_idx;
@@ -660,18 +660,18 @@ void recvTd(int recv_thread_id)
             }
             printf("pmin=%f pmax=%f\n", pmin, pmax );
             Pblocks[block_idx].data_age++;
-            //mtxes[pb->block_id].unlock();
+            mtxes[pb->block_id].unlock();
 
             one_p = true;
         }
         else
         {
-            /*
+
             while (!mtxes[pb->block_id].try_lock())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-            **/
+
             // is Qblock
             block_idx -= WORKER_NUM;
             Qblocks[block_idx].block_id = pb->block_id;
@@ -702,7 +702,7 @@ void recvTd(int recv_thread_id)
             printf("qmin=%f qmax=%f\n", qmin, qmax );
             Qblocks[block_idx].data_age++;
 
-            //mtxes[pb->block_id].unlock();
+            mtxes[pb->block_id].unlock();
             one_q = true;
         }
 
