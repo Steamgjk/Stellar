@@ -528,7 +528,7 @@ void ps_push()
     int fds[100];
     for (int send_td = 0; send_td < WORKER_NUM; send_td++)
     {
-        fds[i] = genActivePushfd(send_td);
+        fds[send_td] = genActivePushfd(send_td);
         sendConnected[send_td] = true;
     }
 
