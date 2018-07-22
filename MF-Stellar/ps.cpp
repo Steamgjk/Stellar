@@ -599,7 +599,7 @@ void ps_push()
             }
             else
             {
-                printf("%d connection ok\n", send_td );
+                //printf("%d connection ok\n", send_td );
             }
         }
         if (ok)
@@ -607,7 +607,7 @@ void ps_push()
             break;
         }
     }
-
+    printf("start ps push\n");
     PriorityE pe;
     size_t data_sz = 0;
     size_t struct_sz = sizeof(Block);
