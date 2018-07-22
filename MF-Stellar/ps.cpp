@@ -874,7 +874,7 @@ void recvTd(int recv_thread_id)
                     pmax = data_eles[i];
                 }
             }
-            printf("pmin=%f pmax=%f\n", pmin, pmax );
+            //printf("pmin=%f pmax=%f\n", pmin, pmax );
             Pblocks[block_idx].data_age++;
 #if (defined ASP_MODE) || (defined SSP_MODE)
             mtxes[pb->block_id].unlock();

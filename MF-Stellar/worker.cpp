@@ -496,6 +496,7 @@ void submf()
         //Qblock_ptr->eles[i] -= oldQ[i];
 
     }
+
     Pblock_ptr->data_age++;
     Qblock_ptr->data_age++;
     gettimeofday(&ed, 0);
@@ -651,6 +652,9 @@ void recvTd(int recv_thread_id)
             ret = sendPullReq(to_recv_cnt, connfd);
             has_request_cnt++;
         }
+#endif
+#ifdef STELLAR
+        one_p = true;
 #endif
         size_t cur_len = 0;
         ret = recv(connfd, blockbuf, struct_sz, 0);
