@@ -77,8 +77,6 @@ float dependency_s[100];
 priority_queue<PriorityE> priorQu;
 mutex qu_mtx;
 
-priority_queue<PriorityE> priorQus[100];
-mutex qu_mtxes[100];
 
 int send_fds[100];
 
@@ -646,11 +644,6 @@ void ps_push()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
-        }
-        //only q block
-        for (int i = 0; i < WORKER_NUM; i++)
-        {
-            Qblocks[i].data_age
         }
         //printf("need not wait\n");
         pe.worker_id = -1;
