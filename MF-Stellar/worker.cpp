@@ -640,6 +640,7 @@ void recvTd(int recv_thread_id)
         struct timeval st, et;
         gettimeofday(&st, 0);
         int ret = -1;
+#ifndef STELLAR
         if (has_request_cnt < to_recv_cnt)
         {
             printf("send request %d\n", to_recv_cnt );
@@ -647,7 +648,7 @@ void recvTd(int recv_thread_id)
             ret = sendPullReq(to_recv_cnt, connfd);
             has_request_cnt++;
         }
-
+#endif
         size_t cur_len = 0;
         ret = recv(connfd, blockbuf, struct_sz, 0);
         struct Block* pb = (struct Block*)(void*)blockbuf;

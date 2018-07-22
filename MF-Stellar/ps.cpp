@@ -39,6 +39,7 @@ void LoadTestRating();
 bool isReady(int block_id, int required_iter, int send_fd);
 int genActivePushfd(int send_thread_id);
 bool curIterFin(int curIter);
+void ps_push();
 bool waitfor = false;
 
 int WORKER_NUM = 1;
@@ -66,6 +67,13 @@ std::mutex mtxes[100];
 
 int iter_t = 0;
 int iter_thresh = 10;
+float alpha = 0.9;
+float beta = 0.5;
+float arrival_time[100];
+float dependency_s[100];
+priority_queue<PriorityE>priorQu;
+mutex qu_mtx;
+int send_fds[100];
 
 int main(int argc, const char * argv[])
 {
@@ -96,6 +104,8 @@ int main(int argc, const char * argv[])
         std::thread recv_thread(recvTd, thid);
         recv_thread.detach();
     }
+
+#ifndef STELLAR
     for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
     {
         sendConnected[send_thread_id] = false;
@@ -103,6 +113,23 @@ int main(int argc, const char * argv[])
         std::thread send_thread(sendTd, thid);
         send_thread.detach();
     }
+#endif
+#ifdef STELLAR
+    for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
+    {
+        send_fds[send_thread_id] = -1;
+    }
+    for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
+    {
+        sendConnected[send_thread_id] = false;
+        int thid = send_thread_id;
+        std::thread send_thread(genActivePushfd, thid);
+        send_thread.detach();
+    }
+    std::thread ps_push_td(ps_push);
+    ps_push_td.detach();
+
+#endif
     /*
         while (1 == 1)
         {
@@ -519,19 +546,38 @@ int genActivePushfd(int send_thread_id)
     }
     while (check_ret < 0);
     printf("[Td:%d]connected %s  %d\n", send_thread_id, remote_ip, remote_port );
+    send_fds[send_thread_id] = fd;
     return fd;
 }
 //send only establish the fd vec, send in sequence
 
 void ps_push()
 {
-    int fds[100];
-    for (int send_td = 0; send_td < WORKER_NUM; send_td++)
+    while (1 == 1)
     {
-        fds[send_td] = genActivePushfd(send_td);
-        sendConnected[send_td] = true;
+        bool ok = true;
+        for (int send_td = 0; send_td < WORKER_NUM; send_td++)
+        {
+            if (send_fds[send_td] < 0)
+            {
+                ok = false;
+            }
+            else
+            {
+                printf("%d connection ok\n", send_td );
+            }
+        }
+        if (ok)
+        {
+            break;
+        }
     }
 
+    PriorityE pe;
+    size_t data_sz = 0;
+    size_t struct_sz = sizeof(Block);
+    char* buf = NULL;
+    int send_fd = -1;
     while (1 == 1)
     {
         if (waitfor)
@@ -539,11 +585,83 @@ void ps_push()
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
+        pe.worker_id = -1;
         //send qid by priority
-
+        while (!qu_mtx.try_lock())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
         //isReady  round robin
-        //sleep for several ms
+        if (!priorQu.empty())
+        {
+            pe = priorQu.top();
+        }
+        qu_mtx.unlock();
+        if (pe.worker_id >= 0)
+        {
+            send_fd = send_fds[pe.worker_id];
+            if (pe.block_id < WORKER_NUM)
+            {
+                //is P block
+                int pbid = pe.block_id;
+                data_sz = sizeof(float) * Pblocks[pbid].eles.size();
+                buf = (char*)malloc(struct_sz + data_sz);
+#if (defined ASP_MODE) || (defined SSP_MODE)
+                while (!mtxes[pe.block_id].try_lock())
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
+#endif
+                memcpy(buf, &(Pblocks[pbid]), struct_sz);
+                memcpy(buf + struct_sz, (char*) & (Pblocks[pbid].eles[0]), data_sz);
+#if (defined ASP_MODE) || (defined SSP_MODE)
+                mtxes[pe.block_id].unlock();
+#endif
+            }
+            else
+            {
+                int qbid = pe.block_id - WORKER_NUM;
+                data_sz = sizeof(float) * Qblocks[qbid].eles.size();
+                buf = (char*)malloc(struct_sz + data_sz);
+#if (defined ASP_MODE) || (defined SSP_MODE)
+                while (!mtxes[pe.block_id].try_lock())
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
+#endif
+                memcpy(buf, &(Qblocks[qbid]), struct_sz);
+                memcpy(buf + struct_sz, (char*) & (Qblocks[pbid].eles[0]), data_sz);
+#if (defined ASP_MODE) || (defined SSP_MODE)
+                mtxes[pe.block_id].unlock();
+#endif
+            }
 
+            size_t to_send_len = 4096;
+            size_t remain_len = struct_sz + data_sz;
+            size_t sent_len = 0;
+            int ret = -1;
+            while (remain_len > 0)
+            {
+                if (to_send_len > remain_len)
+                {
+                    to_send_len = remain_len;
+                }
+                //printf("sending...\n");
+                ret = send(send_fd, buf + sent_len, to_send_len, 0);
+                if (ret >= 0)
+                {
+                    remain_len -= to_send_len;
+                    sent_len += to_send_len;
+                    //printf("remain_len = %ld\n", remain_len);
+                }
+                else
+                {
+                    printf("still fail\n");
+                }
+                //getchar();
+            }
+//sleep for several ms
+        }
 
     }
 }

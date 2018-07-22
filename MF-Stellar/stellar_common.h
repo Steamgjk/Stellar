@@ -24,6 +24,7 @@
 #include <fstream>
 #include <sys/time.h>
 #include <map>
+#include <function.h>
 using namespace std;
 
 #define FILE_NAME "/home/shuai/oneword/trainDS/"
@@ -42,10 +43,11 @@ using namespace std;
 
 #define LOG_FILE "./rmse_log"
 
-//#define BSP_MODE
+#define STELLAR
+#define BSP_MODE
 //#define ASP_MODE
-#define SSP_MODE
-#define SSP_BOUND (2)
+//#define SSP_MODE
+//#define SSP_BOUND (2)
 struct Block
 {
 	int block_id;
@@ -110,6 +112,31 @@ struct ReqMsg
 	int required_iteration;
 	int worker_id;
 	//I am worker id, I ask for my required(dependent) parameter at Iteration data age (i.e. the data age of the parameter should be no less than data-age)
+};
+
+struct PriorityE
+{
+	int worker_id;
+	int block_id;
+	float prior;
+	PriorityE(int wid, int bid, float p)
+	{
+		worker_id = wid;
+		block_id = bid;
+		prior = p;
+	}
+	PriorityE operator=(PriorityE& pitem)
+	{
+		worker_id = pitem.worker_id;
+		block_id = pitem.block_id;
+		prior = pitem.prior;
+		return *this;
+	}
+	bool operator < (const PriorityE &a) const
+	{
+		return prior < a.prior; //最大值优先
+	}
+
 };
 
 #endif
