@@ -638,13 +638,13 @@ void recvTd(int recv_thread_id)
 
     while (1 == 1)
     {
-
+#ifndef STELLAR
         if (to_recv_cnt > iter_cnt)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-
+#endif
         struct timeval st, et;
         gettimeofday(&st, 0);
         int ret = -1;

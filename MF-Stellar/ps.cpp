@@ -654,7 +654,7 @@ void ps_push()
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        printf("iter_t == %d\n", iter_t);
+        //printf("iter_t == %d\n", iter_t);
         pe.worker_id = -1;
         //send qid by priority
         while (!qu_mtx.try_lock())
