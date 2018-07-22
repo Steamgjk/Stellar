@@ -662,7 +662,7 @@ void ps_push()
 
         if (pe.worker_id >= 0)
         {
-            printf("worker_id =%d block_id=%d\n", pe.worker_id, pe.block_id );
+            //printf("worker_id =%d block_id=%d\n", pe.worker_id, pe.block_id );
             send_fd = send_fds[pe.worker_id];
             if (pe.block_id < WORKER_NUM)
             {
@@ -684,6 +684,7 @@ void ps_push()
             }
             else
             {
+                printf("will send worker_id =%d block_id=%d\n", pe.worker_id, pe.block_id );
                 int qbid = pe.block_id - WORKER_NUM;
                 data_sz = sizeof(float) * Qblocks[qbid].eles.size();
                 buf = (char*)malloc(struct_sz + data_sz);
@@ -700,7 +701,7 @@ void ps_push()
                 printf("will send to worker %d the block is %d  data-age=%d\n", pe.worker_id, qbid, Qblocks[qbid].data_age );
 #endif
             }
-
+            printf("splice_sending...\n");
             splice_send(send_fd, buf, struct_sz + data_sz);
             printf("sent to worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
             gettimeofday(&sendt, 0);
