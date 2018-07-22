@@ -24,7 +24,7 @@
 #include <fstream>
 #include <sys/time.h>
 #include <map>
-#include <function.h>
+#include <functional>
 using namespace std;
 
 #define FILE_NAME "/home/shuai/oneword/trainDS/"
