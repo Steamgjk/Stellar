@@ -800,6 +800,7 @@ void recvTd(int recv_thread_id)
 ///
         gettimeofday(&recvt, 0);
         recv_timestamp[recv_thread_id] = (recvt.tv_sec) * 1000000 + recvt.tv_usec;
+
         estimated_arrival_time[recv_thread_id] = alpha * (recv_timestamp[recv_thread_id] - send_timestamp[recv_thread_id]) + (1 - alpha) estimated_arrival_time[recv_thread_id];
 
         float pri = estimated_arrival_time[recv_thread_id];
