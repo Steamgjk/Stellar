@@ -654,8 +654,9 @@ void ps_push()
         if (!priorQu.empty())
         {
             pe = priorQu.top();
+            priorQu.pop();
         }
-        priorQu.pop();
+
         qu_mtx.unlock();
         //printf("empty? %d\n", (pe.worker_id < 0) );
 
