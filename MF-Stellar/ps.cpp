@@ -662,7 +662,7 @@ void ps_push()
 
         if (pe.worker_id >= 0)
         {
-            printf("worker_id =%d\n", pe.worker_id );
+            printf("worker_id =%d block_id=%d\n", pe.worker_id, pe.block_id );
             send_fd = send_fds[pe.worker_id];
             if (pe.block_id < WORKER_NUM)
             {
@@ -697,6 +697,7 @@ void ps_push()
                 memcpy(buf + struct_sz, (char*) & (Qblocks[qbid].eles[0]), data_sz);
 #if (defined ASP_MODE) || (defined SSP_MODE)
                 mtxes[pe.block_id].unlock();
+                printf("will send to worker %d the block is %d  data-age=%d\n", pe.worker_id, qbid, Qblocks[qbid].data_age );
 #endif
             }
 
@@ -915,7 +916,7 @@ void recvTd(int recv_thread_id)
                 }
 
             }
-            printf("qmin=%f qmax=%f\n", qmin, qmax );
+            //printf("qmin=%f qmax=%f\n", qmin, qmax );
             Qblocks[block_idx].data_age++;
 #if (defined ASP_MODE) || (defined SSP_MODE)
             mtxes[pb->block_id].unlock();
