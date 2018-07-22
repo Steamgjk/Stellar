@@ -582,6 +582,7 @@ void splice_send(int send_fd, char* buf, int len)
             printf("still fail\n");
             return false;
         }
+        printf("remain_len=%ld sent_len=%ld\n", remain_len, sent_len );
         //getchar();
     }
     return true;
@@ -702,7 +703,7 @@ void ps_push()
                 printf("will send to worker %d the block is %d  data-age=%d\n", pe.worker_id, qbid, Qblocks[qbid].data_age );
 #endif
             }
-            printf("splice_sending...\n");
+            printf("splice_sending... worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
             splice_send(send_fd, buf, struct_sz + data_sz);
             printf("sent to worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
             gettimeofday(&sendt, 0);
