@@ -807,25 +807,6 @@ void recvTd(int recv_thread_id)
 
 
         struct Block* pb = (struct Block*)(void*)sockBuf;
-
-///
-        gettimeofday(&recvt, 0);
-        recv_timestamp[recv_thread_id] = (recvt.tv_sec) * 1000000 + recvt.tv_usec;
-
-        estimated_arrival_time[recv_thread_id] = alpha * (recv_timestamp[recv_thread_id] - send_timestamp[recv_thread_id]) + (1 - alpha) * estimated_arrival_time[recv_thread_id];
-
-        float pri = estimated_arrival_time[recv_thread_id];
-        //only p block
-        int dependent_worker_id = (recv_thread_id + WORKER_NUM - 1) % WORKER_NUM;
-        PriorityE priE(dependent_worker_id, pb->block_id, pri, pb->data_age);
-        while (!qu_mtx.try_lock())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-        priorQu.push(priE);
-        qu_mtx.unlock();
-///
-
         size_t data_sz = sizeof(float) * (pb->ele_num);
         char* dataBuf = (char*)malloc(data_sz);
         cur_len = 0;
@@ -926,6 +907,25 @@ void recvTd(int recv_thread_id)
 #endif
             one_q = true;
         }
+
+
+///
+        gettimeofday(&recvt, 0);
+        recv_timestamp[recv_thread_id] = (recvt.tv_sec) * 1000000 + recvt.tv_usec;
+
+        estimated_arrival_time[recv_thread_id] = alpha * (recv_timestamp[recv_thread_id] - send_timestamp[recv_thread_id]) + (1 - alpha) * estimated_arrival_time[recv_thread_id];
+
+        float pri = estimated_arrival_time[recv_thread_id];
+        //only q block
+        int dependent_worker_id = (recv_thread_id + WORKER_NUM - 1) % WORKER_NUM;
+        PriorityE priE(dependent_worker_id, pb->block_id, pri, pb->data_age);
+        while (!qu_mtx.try_lock())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        priorQu.push(priE);
+        qu_mtx.unlock();
+///
 
         free(sockBuf);
         free(dataBuf);
