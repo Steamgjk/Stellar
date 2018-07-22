@@ -657,6 +657,7 @@ void ps_push()
         }
         qu_mtx.unlock();
         printf("empty? %d\n", (pe.worker_id < 0) );
+
         if (pe.worker_id >= 0)
         {
             printf("worker_id =%d\n", pe.worker_id );
