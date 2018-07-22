@@ -238,7 +238,7 @@ int main(int argc, const char * argv[])
         printf("RMSE-thd iter_t=%d\n", iter_t );
         //if (recvCount == WORKER_NUM)
         {
-            if (iter_t % 10 == 0 )
+            if (iter_t % 10 == 0 && iter_t > 0)
                 //if (iter_t == iter_thresh)
             {
                 waitfor = true;
@@ -702,7 +702,7 @@ void ps_push()
             }
 
             splice_send(send_fd, buf, struct_sz + data_sz);
-
+            printf("sent to worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
             gettimeofday(&sendt, 0);
             send_timestamp[pe.worker_id] = (sendt.tv_sec) * 1000000 + sendt.tv_usec;
 //sleep for several ms

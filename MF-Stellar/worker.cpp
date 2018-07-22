@@ -165,7 +165,9 @@ int main(int argc, const char * argv[])
             printf("Computing... iter %d pbid=%d qbid=%d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->block_id, Qblock_ptr->block_id, Pblock_ptr->data_age, Qblock_ptr->data_age);
             submf();
             printf("Pushing... iter  %d\n", iter_cnt );
+#ifndef STELLAR
             push_block(push_fd, (*Pblock_ptr));
+#endif
             push_block(push_fd, (*Qblock_ptr));
             printf("Pushed... iter %d\n", iter_cnt);
             iter_cnt++;
