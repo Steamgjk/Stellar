@@ -313,10 +313,18 @@ bool curIterFin(int curIter)
     }
     for (int i = 0; i < WORKER_NUM; i++)
     {
+#ifndef STELLAR
         if (Pblocks[i].data_age <= curIter || Qblocks[i].data_age <= curIter)
         {
             return false;
         }
+#endif
+#ifdef STELLAR
+        if (Qblocks[i].data_age <= curIter)
+        {
+            return false;
+        }
+#endif
     }
     return true;
 }
