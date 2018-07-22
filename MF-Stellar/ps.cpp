@@ -71,7 +71,7 @@ float alpha = 0.9;
 float beta = 0.5;
 float arrival_time[100];
 float dependency_s[100];
-priority_queue<PriorityE>priorQu;
+priority_queue<PriorityE> priorQu;
 mutex qu_mtx;
 int send_fds[100];
 
@@ -630,7 +630,7 @@ void ps_push()
                 }
 #endif
                 memcpy(buf, &(Qblocks[qbid]), struct_sz);
-                memcpy(buf + struct_sz, (char*) & (Qblocks[pbid].eles[0]), data_sz);
+                memcpy(buf + struct_sz, (char*) & (Qblocks[qbid].eles[0]), data_sz);
 #if (defined ASP_MODE) || (defined SSP_MODE)
                 mtxes[pe.block_id].unlock();
 #endif
