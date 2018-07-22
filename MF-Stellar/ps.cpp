@@ -694,7 +694,7 @@ void ps_push()
             }
             else
             {
-                printf("will send worker_id =%d block_id=%d\n", pe.worker_id, pe.block_id );
+
                 int qbid = pe.block_id - WORKER_NUM;
                 data_sz = sizeof(float) * Qblocks[qbid].eles.size();
                 buf = (char*)malloc(struct_sz + data_sz);
@@ -711,9 +711,9 @@ void ps_push()
                 printf("will send to worker %d the block is %d  data-age=%d\n", pe.worker_id, qbid, Qblocks[qbid].data_age );
 #endif
             }
-            printf("splice_sending... worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
+            printf("splice_sending... worker %d  block_id=%d data-age=%d\n", pe.worker_id, pe.block_id, Qblocks[qbid].data_age );
             splice_send(send_fd, buf, struct_sz + data_sz);
-            printf("sent to worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
+            printf("sent to worker %d  block_id=%d data-age=%d\n", pe.worker_id, pe.block_id, Qblocks[qbid].data_age );
             gettimeofday(&sendt, 0);
             send_timestamp[pe.worker_id] = (sendt.tv_sec) * 1000000 + sendt.tv_usec;
 //sleep for several ms
