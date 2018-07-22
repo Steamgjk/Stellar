@@ -135,7 +135,7 @@ struct PriorityE
 	PriorityE operator=(const PriorityE& pitem)
 	{
 		worker_id = pitem.worker_id;
-		block_id = pitem.block_id;
+		block_id = pitem.block_id; //dependent blk
 		prior = pitem.prior;
 		return *this;
 	}

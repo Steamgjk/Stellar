@@ -40,8 +40,9 @@ bool isReady(int block_id, int required_iter, int send_fd);
 int genActivePushfd(int send_thread_id);
 bool curIterFin(int curIter);
 void ps_push();
-bool waitfor = false;
+void splice_send(int send_fd, char* buf, int len);
 
+bool waitfor = false;
 int WORKER_NUM = 1;
 char* local_ips[CAP] = {"12.12.10.18", "12.12.10.18", "12.12.10.18", "12.12.10.18"};
 int local_ports[CAP] = {4411, 4412, 4413, 4414};
@@ -69,11 +70,15 @@ int iter_t = 0;
 int iter_thresh = 10;
 float alpha = 0.9;
 float beta = 0.5;
-float arrival_time[100];
+float send_timestamp[100];
+float recv_timestamp[100];
+float estimated_arrival_time[100];
 float dependency_s[100];
 priority_queue<PriorityE> priorQu;
 mutex qu_mtx;
 int send_fds[100];
+
+
 
 int main(int argc, const char * argv[])
 {
@@ -549,6 +554,36 @@ int genActivePushfd(int send_thread_id)
     send_fds[send_thread_id] = fd;
     return fd;
 }
+
+void splice_send(int send_fd, char* buf, int len)
+{
+    size_t to_send_len = 4096;
+    size_t remain_len = len;
+    size_t sent_len = 0;
+    int ret = -1;
+    while (remain_len > 0)
+    {
+        if (to_send_len > remain_len)
+        {
+            to_send_len = remain_len;
+        }
+        //printf("sending...\n");
+        ret = send(send_fd, buf + sent_len, to_send_len, 0);
+        if (ret >= 0)
+        {
+            remain_len -= to_send_len;
+            sent_len += to_send_len;
+            //printf("remain_len = %ld\n", remain_len);
+        }
+        else
+        {
+            printf("still fail\n");
+            return false;
+        }
+        //getchar();
+    }
+    return true;
+}
 //send only establish the fd vec, send in sequence
 
 void ps_push()
@@ -578,6 +613,28 @@ void ps_push()
     size_t struct_sz = sizeof(Block);
     char* buf = NULL;
     int send_fd = -1;
+
+    struct timeval sendt;
+    //send age 0
+    for (int send_td = 0; send_td < WORKER_NUM; send_td++)
+    {
+        data_sz = sizeof(float) * Pblocks[send_td].eles.size();
+        buf = (char*)malloc(struct_sz + data_sz);
+        memcpy(buf, &(Pblocks[send_td]), struct_sz);
+        memcpy(buf + struct_sz, (char*) & (Pblocks[send_td].eles[0]), data_sz);
+        splice_send(send_fds[send_td], buf, struct_sz + data_sz);
+        free(buf);
+        data_sz = sizeof(float) * Qblocks[send_td].eles.size();
+        buf = (char*)malloc(struct_sz + data_sz);
+        memcpy(buf, &(Qblocks[send_td]), struct_sz);
+        memcpy(buf + struct_sz, (char*) & (Qblocks[send_td].eles[0]), data_sz);
+        splice_send(send_fds[send_td], buf, struct_sz + data_sz);
+        free(buf);
+
+        gettimeofday(&sendt, 0);
+        send_timestamp[send_td] = (sendt.tv_sec) * 1000000 + sendt.tv_usec;
+
+    }
     while (1 == 1)
     {
         if (waitfor)
@@ -636,30 +693,10 @@ void ps_push()
 #endif
             }
 
-            size_t to_send_len = 4096;
-            size_t remain_len = struct_sz + data_sz;
-            size_t sent_len = 0;
-            int ret = -1;
-            while (remain_len > 0)
-            {
-                if (to_send_len > remain_len)
-                {
-                    to_send_len = remain_len;
-                }
-                //printf("sending...\n");
-                ret = send(send_fd, buf + sent_len, to_send_len, 0);
-                if (ret >= 0)
-                {
-                    remain_len -= to_send_len;
-                    sent_len += to_send_len;
-                    //printf("remain_len = %ld\n", remain_len);
-                }
-                else
-                {
-                    printf("still fail\n");
-                }
-                //getchar();
-            }
+            splice_send(send_fd, buf, struct_sz + data_sz);
+
+            gettimeofday(&sendt, 0);
+            send_timestamp[pe.worker_id] = (sendt.tv_sec) * 1000000 + sendt.tv_usec;
 //sleep for several ms
         }
 
@@ -734,7 +771,7 @@ void recvTd(int recv_thread_id)
             continue;
         }
         //printf("recving ...\n");
-        struct timeval st, et;
+        struct timeval st, et, recvt;
         gettimeofday(&st, 0);
         size_t expected_len = sizeof(Block);
         char* sockBuf = (char*)malloc(expected_len);
@@ -756,8 +793,27 @@ void recvTd(int recv_thread_id)
             cur_len += ret;
             //printf("cur_len=%d expected_len=%d\n", cur_len, expected_len );
         }
+
+
         struct Block* pb = (struct Block*)(void*)sockBuf;
-        //pb->printBlock();
+
+///
+        gettimeofday(&recvt, 0);
+        recv_timestamp[recv_thread_id] = (recvt.tv_sec) * 1000000 + recvt.tv_usec;
+        estimated_arrival_time[recv_thread_id] = alpha * (recv_timestamp[recv_thread_id] - send_timestamp[recv_thread_id]) + (1 - alpha) estimated_arrival_time[recv_thread_id];
+
+        float pri = estimated_arrival_time[recv_thread_id];
+        //only p block
+        int next_block_id = (recv_thread_id + pb->data_age) % WORKER_NUM + WORKER_NUM;
+        while (!qu_mtx.try_lock())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        PriorityE priE(recv_thread_id, next_block_id, pri);
+        priorQu.push(priE);
+        qu_mtx.unlock();
+///
+
         size_t data_sz = sizeof(float) * (pb->ele_num);
         char* dataBuf = (char*)malloc(data_sz);
         cur_len = 0;
