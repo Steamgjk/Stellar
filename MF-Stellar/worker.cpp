@@ -241,7 +241,7 @@ void WaitforParas(int cur_iter)
 #endif
 
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             }
 
 
@@ -659,6 +659,7 @@ void recvTd(int recv_thread_id)
         one_p = true;
 #endif
         size_t cur_len = 0;
+        printf("[%d] recving...\n", recv_thread_id );
         ret = recv(connfd, blockbuf, struct_sz, 0);
         struct Block* pb = (struct Block*)(void*)blockbuf;
         data_sz = sizeof(float) * (pb->ele_num);
@@ -678,6 +679,7 @@ void recvTd(int recv_thread_id)
 
         if (pb->block_id < WORKER_NUM)
         {
+            printf("recved Pblock bid=%d  age=%d\n", pb->block_id, pb->data_age);
             //is Pblock
             int pbid = pb->block_id;
             Pblocks[pbid].block_id = pbid;
@@ -696,6 +698,7 @@ void recvTd(int recv_thread_id)
         }
         else
         {
+            printf("recved Qblock bid=%d  age=%d\n", pb->block_id, pb->data_age);
             int qbid = pb->block_id - WORKER_NUM;
             Qblocks[qbid].block_id = pb->block_id;
             Qblocks[qbid].sta_idx = pb->sta_idx;

@@ -582,7 +582,7 @@ void splice_send(int send_fd, char* buf, int len)
             printf("still fail\n");
             return false;
         }
-        printf("remain_len=%ld sent_len=%ld\n", remain_len, sent_len );
+        //printf("remain_len=%ld sent_len=%ld\n", remain_len, sent_len );
         //getchar();
     }
     return true;
