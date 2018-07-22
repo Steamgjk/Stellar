@@ -277,7 +277,6 @@ int main(int argc, const char * argv[])
                         {
                             qmax = fabs(Qblocks[ii].eles[jj]);
                         }
-
                     }
                     printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
                     recvCount = 0;
@@ -918,7 +917,7 @@ void recvTd(int recv_thread_id)
         }
 
 
-///
+#ifdef STELLAR
         gettimeofday(&recvt, 0);
         recv_timestamp[recv_thread_id] = (recvt.tv_sec) * 1000000 + recvt.tv_usec;
 
@@ -934,7 +933,7 @@ void recvTd(int recv_thread_id)
         }
         priorQu.push(priE);
         qu_mtx.unlock();
-///
+#endif
 
         free(sockBuf);
         free(dataBuf);
