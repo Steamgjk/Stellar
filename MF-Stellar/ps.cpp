@@ -76,6 +76,10 @@ float estimated_arrival_time[100];
 float dependency_s[100];
 priority_queue<PriorityE> priorQu;
 mutex qu_mtx;
+
+priority_queue<PriorityE> priorQus[100];
+mutex qu_mtxes[100];
+
 int send_fds[100];
 
 
@@ -643,6 +647,11 @@ void ps_push()
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
+        //only q block
+        for (int i = 0; i < WORKER_NUM; i++)
+        {
+            Qblocks[i].data_age
+        }
         //printf("need not wait\n");
         pe.worker_id = -1;
         //send qid by priority
@@ -656,7 +665,6 @@ void ps_push()
             pe = priorQu.top();
             priorQu.pop();
         }
-
         qu_mtx.unlock();
         //printf("empty? %d\n", (pe.worker_id < 0) );
 
@@ -814,12 +822,12 @@ void recvTd(int recv_thread_id)
 
         float pri = estimated_arrival_time[recv_thread_id];
         //only p block
-        int next_block_id = (recv_thread_id + pb->data_age) % WORKER_NUM + WORKER_NUM;
+        int dependent_worker_id = (recv_thread_id + WORKER_NUM - 1) % WORKER_NUM;
+        PriorityE priE(dependent_worker_id, pb->block_id, pri, pb->data_age);
         while (!qu_mtx.try_lock())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        PriorityE priE(recv_thread_id, next_block_id, pri);
         priorQu.push(priE);
         qu_mtx.unlock();
 ///
