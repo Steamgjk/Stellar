@@ -120,23 +120,27 @@ struct PriorityE
 	int worker_id;
 	int block_id;
 	float prior;
+	int required_data_age;
 	PriorityE()
 	{
 		worker_id = -1;
 		block_id = -1;
 		prior = -1;
+		required_data_age = -1;
 	}
-	PriorityE(int wid, int bid, float p)
+	PriorityE(int wid, int bid, float p, int ra)
 	{
 		worker_id = wid;
 		block_id = bid;
 		prior = p;
+		required_data_age = ra;
 	}
 	PriorityE operator=(const PriorityE& pitem)
 	{
 		worker_id = pitem.worker_id;
 		block_id = pitem.block_id; //dependent blk
 		prior = pitem.prior;
+		required_data_age = pitem.required_data_age;
 		return *this;
 	}
 	bool operator < (const PriorityE &a) const
