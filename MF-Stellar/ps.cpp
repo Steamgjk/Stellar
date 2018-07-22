@@ -643,7 +643,7 @@ void ps_push()
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        printf("need not wait\n");
+        //printf("need not wait\n");
         pe.worker_id = -1;
         //send qid by priority
         while (!qu_mtx.try_lock())
@@ -655,8 +655,9 @@ void ps_push()
         {
             pe = priorQu.top();
         }
+        priorQu.pop();
         qu_mtx.unlock();
-        printf("empty? %d\n", (pe.worker_id < 0) );
+        //printf("empty? %d\n", (pe.worker_id < 0) );
 
         if (pe.worker_id >= 0)
         {
