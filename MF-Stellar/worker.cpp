@@ -483,24 +483,24 @@ void submf()
         }
     }
 
+    /*
+        for (size_t i = 0; i < oldP.size(); i++)
+        {
 
-    for (size_t i = 0; i < oldP.size(); i++)
-    {
-
-        Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] > 0.5) ? (0.2) : (Pblock_ptr->eles[i]);
-        Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] < -0.5) ? (0) : (Pblock_ptr->eles[i]);
-        //Pblock_ptr->eles[i] -= oldP[i];
+            Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] > 0.5) ? (0.2) : (Pblock_ptr->eles[i]);
+            Pblock_ptr->eles[i] = (Pblock_ptr->eles[i] < -0.5) ? (0) : (Pblock_ptr->eles[i]);
+            //Pblock_ptr->eles[i] -= oldP[i];
 
 
-    }
-    for (size_t i = 0; i < oldQ.size(); i++)
-    {
-        Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] > 0.5) ? (0.2) : (Qblock_ptr->eles[i]);
-        Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] < -0.5) ? (0) : (Qblock_ptr->eles[i]);
-        //Qblock_ptr->eles[i] -= oldQ[i];
+        }
+        for (size_t i = 0; i < oldQ.size(); i++)
+        {
+            Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] > 0.5) ? (0.2) : (Qblock_ptr->eles[i]);
+            Qblock_ptr->eles[i] = (Qblock_ptr->eles[i] < -0.5) ? (0) : (Qblock_ptr->eles[i]);
+            //Qblock_ptr->eles[i] -= oldQ[i];
 
-    }
-
+        }
+    **/
     Pblock_ptr->data_age++;
     Qblock_ptr->data_age++;
     gettimeofday(&ed, 0);
