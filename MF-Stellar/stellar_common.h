@@ -15,6 +15,7 @@
 #include <cmath>
 #include <time.h>
 #include <vector>
+#include <queue>
 #include <list>
 #include <thread>
 #include <chrono>
