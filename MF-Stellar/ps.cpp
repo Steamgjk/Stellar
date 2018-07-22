@@ -646,7 +646,7 @@ void ps_push()
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        //printf("need not wait\n");
+        printf("iter_t == %d\n", iter_t);
         pe.worker_id = -1;
         //send qid by priority
         while (!qu_mtx.try_lock())
@@ -703,9 +703,9 @@ void ps_push()
                 printf("will send to worker %d the block is %d  data-age=%d\n", pe.worker_id, qbid, Qblocks[qbid].data_age );
 #endif
             }
-            printf("splice_sending... worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
+            //printf("splice_sending... worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
             splice_send(send_fd, buf, struct_sz + data_sz);
-            printf("sent to worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
+            //printf("sent to worker %d  block_id=%d\n", pe.worker_id, pe.block_id);
             gettimeofday(&sendt, 0);
             send_timestamp[pe.worker_id] = (sendt.tv_sec) * 1000000 + sendt.tv_usec;
 //sleep for several ms
