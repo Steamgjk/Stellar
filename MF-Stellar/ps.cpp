@@ -669,7 +669,8 @@ void ps_push()
         }
         qu_mtx.unlock();
         //printf("empty? %d\n", (pe.worker_id < 0) );
-
+        int pbid = -1;
+        int qbid = -1;
         if (pe.worker_id >= 0)
         {
             //printf("worker_id =%d block_id=%d\n", pe.worker_id, pe.block_id );
@@ -677,7 +678,7 @@ void ps_push()
             if (pe.block_id < WORKER_NUM)
             {
                 //is P block
-                int pbid = pe.block_id;
+                pbid = pe.block_id;
                 data_sz = sizeof(float) * Pblocks[pbid].eles.size();
                 buf = (char*)malloc(struct_sz + data_sz);
 #if (defined ASP_MODE) || (defined SSP_MODE)
@@ -695,7 +696,7 @@ void ps_push()
             else
             {
 
-                int qbid = pe.block_id - WORKER_NUM;
+                qbid = pe.block_id - WORKER_NUM;
                 data_sz = sizeof(float) * Qblocks[qbid].eles.size();
                 buf = (char*)malloc(struct_sz + data_sz);
 #if (defined ASP_MODE) || (defined SSP_MODE)
