@@ -119,6 +119,12 @@ struct PriorityE
 	int worker_id;
 	int block_id;
 	float prior;
+	PriorityE()
+	{
+		worker_id = -1;
+		block_id = -1;
+		prior = -1;
+	}
 	PriorityE(int wid, int bid, float p)
 	{
 		worker_id = wid;
