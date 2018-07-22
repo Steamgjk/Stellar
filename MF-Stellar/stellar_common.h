@@ -132,7 +132,7 @@ struct PriorityE
 		block_id = bid;
 		prior = p;
 	}
-	PriorityE operator=(PriorityE& pitem)
+	PriorityE operator=(const PriorityE& pitem)
 	{
 		worker_id = pitem.worker_id;
 		block_id = pitem.block_id;
