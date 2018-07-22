@@ -712,6 +712,7 @@ void recvTd(int recv_thread_id)
         if (one_p && one_q)
         {
             printf("received paras for iter %d\n", to_recv_cnt );
+            printf("qbid=%d  data-age = %d\n", qbid, Qblocks[qbid].data_age );
             to_recv_cnt++;
             one_p = false;
             one_q = false;
