@@ -28,8 +28,8 @@
 #include <functional>
 using namespace std;
 
-#define FILE_NAME "/home/shuai/oneword/trainDS/"
-#define TEST_NAME "/home/shuai/oneword/validationDS"
+
+
 #define N 1000990
 #define M 624961
 #define K  100 //主题个数
@@ -43,6 +43,18 @@ using namespace std;
 #define WORKER_THREAD_NUM 4
 
 #define LOG_FILE "./rmse_log"
+
+#define TEST_BED
+
+#ifndef TEST_BED
+#define FILE_NAME "/home/shuai/oneword/trainDS/"
+#define TEST_NAME "/home/shuai/oneword/validationDS"
+#endif
+
+#ifndef TEST_BED
+#define FILE_NAME "/home/oneword/trainDS/"
+#define TEST_NAME "/home/oneword/validationDS"
+#endif
 
 //#define STELLAR
 #define BSP_MODE

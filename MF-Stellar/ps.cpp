@@ -87,15 +87,16 @@ int send_fds[100];
 int main(int argc, const char * argv[])
 {
     //ofstream ofs(LOG_FILE, ios::trunc);
-    //char* lip  = "127.0.0.1";
 
-    /*
-        for (int i = 0; i < CAP; i++)
-        {
-            local_ips[i] = lip;
-            remote_ips[i] = lip;
-        }
-    **/
+#ifndef TEST_BED
+    char* lip  = "127.0.0.1";
+    for (int i = 0; i < CAP; i++)
+    {
+        local_ips[i] = lip;
+        remote_ips[i] = lip;
+    }
+#endif
+
     for (int i = 0; i < CAP; i++)
     {
         local_ports[i] = 10000 + i;
