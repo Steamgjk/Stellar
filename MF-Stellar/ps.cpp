@@ -306,6 +306,7 @@ void PeriodicStatistics()
 {
     ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
+    /*
     while (1 == 1)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(50000));
@@ -354,6 +355,7 @@ void PeriodicStatistics()
         waitfor = false;
         getchar();
     }
+    **/
 }
 bool curIterFin(int curIter)
 {
