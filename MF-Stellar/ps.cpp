@@ -41,6 +41,8 @@ int genActivePushfd(int send_thread_id);
 bool curIterFin(int curIter);
 void ps_push();
 void splice_send(int send_fd, char* buf, int len);
+void PeriodicStatistics();
+
 
 bool waitfor = false;
 int WORKER_NUM = 1;
@@ -163,8 +165,6 @@ int main(int argc, const char * argv[])
     **/
     srand(1);
 
-
-
     row_unit = ROW_UNIT * (ROW_PS / WORKER_NUM);
     col_unit = COL_UNIT * (COL_RS / WORKER_NUM);
     printf("row_unit = %d col_unit=%d\n", row_unit, col_unit );
@@ -179,6 +179,10 @@ int main(int argc, const char * argv[])
     printf("start work\n");
     partitionP(Pblocks);
     partitionQ(Qblocks);
+
+    std::thread periodic_td(PeriodicStatistics);
+    periodic_td.detach();
+
     for (int i = 0; i < WORKER_NUM; i++)
     {
         printf("Psz [%d][%ld]  Qsz [%d][%ld]\n", Pblocks[i].ele_num, Pblocks[i].eles.size(), Qblocks[i].ele_num, Qblocks[i].eles.size() );
@@ -191,6 +195,7 @@ int main(int argc, const char * argv[])
             Qblocks[i].eles[j] = drand48() * 0.2;
         }
     }
+
     float ini_rmse = CalcRMSE();
     printf("ini_rmse = %f\n", ini_rmse );
 
@@ -233,6 +238,7 @@ int main(int argc, const char * argv[])
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
+        /*
         if (iter_t == 0)
         {
             gettimeofday(&beg, 0);
@@ -291,18 +297,63 @@ int main(int argc, const char * argv[])
             }
 
         }
+        **/
         iter_t++;
-        if (iter_t % 100 == 0)
-        {
-            for (int i = 0; i <= iter_t / 10; i++)
-            {
-                printf("%lld\n", time_span[i] );
-            }
-
-        }
-
     }
     return 0;
+}
+void PeriodicStatistics()
+{
+    int time_units = 0;
+    while (1 == 1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+        time_units++;
+
+        waitfor = true;
+        printf("Entering statistics...\n");
+        gettimeofday(&ed, 0);
+        time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
+        float pmin, pmax, qmin, qmax;
+        pmin = 9999999;
+        qmin = 9999999;
+        pmax = -1;
+        qmax = -1;
+        for (int ii = 0; ii < WORKER_NUM; ii++)
+        {
+            //WriteLog(Pblocks[ii], Qblocks[ii], iter_t);
+            for (int jj = 0; jj < Pblocks[ii].ele_num; jj++)
+            {
+                if (pmin > fabs(Pblocks[ii].eles[jj]))
+                {
+                    pmin = fabs(Pblocks[ii].eles[jj]);
+                }
+                if (pmax < fabs(Pblocks[ii].eles[jj]))
+                {
+                    pmax = fabs(Pblocks[ii].eles[jj]);
+                }
+
+            }
+            for (int jj = 0; jj < Qblocks[ii].ele_num; jj++)
+            {
+                if (qmin > fabs(Qblocks[ii].eles[jj]))
+                {
+                    qmin = fabs(Qblocks[ii].eles[jj]);
+                }
+                if (qmax < fabs(Qblocks[ii].eles[jj]))
+                {
+                    qmax = fabs(Qblocks[ii].eles[jj]);
+                }
+            }
+            printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
+            recvCount = 0;
+        }
+        printf("Calclating RMSE... \n");
+        float rmse = CalcRMSE();
+        ofs << iter_t << "\t" << rmse << endl;
+        printf("time= %d\t rmse=%f\n", time_units, rmse );
+        waitfor = false;
+    }
 }
 bool curIterFin(int curIter)
 {
