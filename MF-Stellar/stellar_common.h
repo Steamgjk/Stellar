@@ -58,9 +58,9 @@ using namespace std;
 
 //#define STELLAR
 //#define BSP_MODE //ini_rmse 46.41
-#define ASP_MODE
-//#define SSP_MODE
-//#define SSP_BOUND (2)
+//#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
+#define SSP_MODE
+#define SSP_BOUND (2)
 struct Block
 {
 	int block_id;
