@@ -533,12 +533,6 @@ bool isReady(int block_id, int required_iter, int fd)
     //getchar();
     if (block_id < WORKER_NUM)
     {
-#ifdef SSP_MODE
-        if (required_iter > 0)
-        {
-            return true;
-        }
-#endif
         // is P block
         int pbid = block_id;
 #ifdef BSP_MODE
