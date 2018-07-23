@@ -170,9 +170,9 @@ int main(int argc, const char * argv[])
             printf("Computing... iter %d pbid=%d qbid=%d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->block_id, Qblock_ptr->block_id, Pblock_ptr->data_age, Qblock_ptr->data_age);
 #endif
             submf();
-#ifdef DEBUG
+
             printf("Pushing... iter  %d\n", iter_cnt );
-#endif
+
 #ifndef STELLAR
             push_block(push_fd, (*Pblock_ptr));
 #endif
@@ -241,7 +241,10 @@ void WaitforParas(int cur_iter)
 
 
     Pblock_ptr = &(Pblocks[pbid]);
+#ifdef DEBUG
     printf("waiting for qid=%d  data-age =%d  cur_iter=%d\n", qbid, Qblocks[qbid].data_age, cur_iter );
+#endif
+
 #ifdef BSP_MODE
     while (Qblocks[qbid].data_age < cur_iter)
 #endif
