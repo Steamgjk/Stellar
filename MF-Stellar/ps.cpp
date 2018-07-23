@@ -894,7 +894,7 @@ void recvTd(int recv_thread_id)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        //printf("recving ...\n");
+        printf("recving ...\n");
         struct timeval st, et, recvt;
         gettimeofday(&st, 0);
         size_t expected_len = sizeof(Block);
@@ -938,6 +938,7 @@ void recvTd(int recv_thread_id)
 
         float* data_eles = (float*)(void*)dataBuf;
         int block_idx = pb->block_id ;
+        printf("recved block_idx=%d data_age=%d\n", pb->block_id. pb->data_age );
         if (block_idx < WORKER_NUM)
         {
 #if (defined ASP_MODE) || (defined SSP_MODE)
@@ -1002,15 +1003,16 @@ void recvTd(int recv_thread_id)
                 //Qblocks[block_idx].eles[i] += data_eles[i];
                 Qblocks[block_idx].eles[i] = data_eles[i];
                 //Qblocks[block_idx].eles[i] = (Qblocks[block_idx].eles[i] > 0.25) ? (0.25) : (Qblocks[block_idx].eles[i]);
-
-                if (qmin > data_eles[i])
-                {
-                    qmin = data_eles[i];
-                }
-                if (qmax < data_eles[i])
-                {
-                    qmax = data_eles[i];
-                }
+                /*
+                                if (qmin > data_eles[i])
+                                {
+                                    qmin = data_eles[i];
+                                }
+                                if (qmax < data_eles[i])
+                                {
+                                    qmax = data_eles[i];
+                                }
+                **/
 
             }
             //printf("qmin=%f qmax=%f\n", qmin, qmax );

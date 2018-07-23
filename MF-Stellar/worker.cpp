@@ -177,9 +177,9 @@ int main(int argc, const char * argv[])
             push_block(push_fd, (*Pblock_ptr));
 #endif
             push_block(push_fd, (*Qblock_ptr));
-#ifdef DEBUG
+//#ifdef DEBUG
             printf("Pushed... iter %d\n", iter_cnt);
-#endif
+//#endif
             iter_cnt++;
             if (1 == 0)
             {
