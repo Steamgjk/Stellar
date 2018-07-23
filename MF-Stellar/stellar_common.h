@@ -51,7 +51,7 @@ using namespace std;
 #define TEST_NAME "/home/shuai/oneword/validationDS"
 #endif
 
-#ifndef TEST_BED
+#ifdef TEST_BED
 #define FILE_NAME "/home/oneword/trainDS/"
 #define TEST_NAME "/home/oneword/validationDS"
 #endif
