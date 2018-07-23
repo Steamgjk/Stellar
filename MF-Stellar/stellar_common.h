@@ -57,8 +57,8 @@ using namespace std;
 #endif
 
 //#define STELLAR
-#define BSP_MODE
-//#define ASP_MODE
+//#define BSP_MODE
+#define ASP_MODE
 //#define SSP_MODE
 //#define SSP_BOUND (2)
 struct Block
