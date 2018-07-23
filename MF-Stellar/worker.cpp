@@ -162,16 +162,24 @@ int main(int argc, const char * argv[])
             }
 
             //SGD
+#ifdef DEBUG
             printf("waiting for Paras iter_cnt=%d\n", iter_cnt);
+#endif
             WaitforParas(iter_cnt);
+#ifdef DEBUG
             printf("Computing... iter %d pbid=%d qbid=%d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->block_id, Qblock_ptr->block_id, Pblock_ptr->data_age, Qblock_ptr->data_age);
+#endif
             submf();
+#ifdef DEBUG
             printf("Pushing... iter  %d\n", iter_cnt );
+#endif
 #ifndef STELLAR
             push_block(push_fd, (*Pblock_ptr));
 #endif
             push_block(push_fd, (*Qblock_ptr));
+#ifdef DEBUG
             printf("Pushed... iter %d\n", iter_cnt);
+#endif
             iter_cnt++;
             if (1 == 0)
             {
@@ -336,7 +344,9 @@ void CalcUpdt(int td_id)
             int p_block_idx = rb_ids[td_id];
             int q_block_idx = cb_ids[td_id];
             size_t block_sz = entry_vec[p_block_idx][q_block_idx].size();
+#ifdef DEBUG
             printf("CalcUpdt[%d] pid=%d qid=%d block_sz=%ld\n", td_id, p_block_idx, q_block_idx, block_sz );
+#endif
 
             if (block_sz == 0)
             {
@@ -453,11 +463,12 @@ void submf()
     //printf("A rb_ids.size=%ld  cb_ids.sz=%ld\n", rb_ids.size(), cb_ids.size() );
     random_shuffle(rb_ids.begin(), rb_ids.end()); //迭代器
     random_shuffle(cb_ids.begin(), cb_ids.end()); //迭代器
-
+#ifdef DEBUG
     for (size_t i = 0; i < rb_ids.size(); i++)
     {
         printf("%d %d\n", rb_ids[i], cb_ids[i]);
     }
+#endif
 
     struct timeval beg, ed;
     long long mksp;
@@ -655,7 +666,9 @@ void recvTd(int recv_thread_id)
 #ifndef STELLAR
         if (has_request_cnt < to_recv_cnt)
         {
+#ifdef DEBUG
             printf("send request %d\n", to_recv_cnt );
+#endif
             // In stellar, we donot need active pull
             ret = sendPullReq(to_recv_cnt, connfd);
             has_request_cnt++;
@@ -665,7 +678,9 @@ void recvTd(int recv_thread_id)
         one_p = true;
 #endif
         size_t cur_len = 0;
+#ifdef DEBUG
         printf("[%d] recving...\n", recv_thread_id );
+#endif
         ret = recv(connfd, blockbuf, struct_sz, 0);
         struct Block* pb = (struct Block*)(void*)blockbuf;
         data_sz = sizeof(float) * (pb->ele_num);
@@ -685,7 +700,9 @@ void recvTd(int recv_thread_id)
 
         if (pb->block_id < WORKER_NUM)
         {
+#ifdef DEBUG
             printf("recved Pblock bid=%d  age=%d\n", pb->block_id, pb->data_age);
+#endif
             //is Pblock
             int pbid = pb->block_id;
             Pblocks[pbid].block_id = pbid;
@@ -708,7 +725,9 @@ void recvTd(int recv_thread_id)
         }
         else
         {
+#ifdef DEBUG
             printf("recved Qblock bid=%d  age=%d\n", pb->block_id, pb->data_age);
+#endif
             int qbid = pb->block_id - WORKER_NUM;
             Qblocks[qbid].block_id = pb->block_id;
             Qblocks[qbid].sta_idx = pb->sta_idx;
@@ -730,8 +749,10 @@ void recvTd(int recv_thread_id)
         free(dataBuf);
         if (one_p && one_q)
         {
+#ifdef DEBUG
             printf("received paras for iter %d\n", to_recv_cnt );
             printf("qbid=%d  data-age = %d\n", pb->block_id - WORKER_NUM, Qblocks[pb->block_id - WORKER_NUM].data_age );
+#endif
             to_recv_cnt++;
             one_p = false;
             one_q = false;
