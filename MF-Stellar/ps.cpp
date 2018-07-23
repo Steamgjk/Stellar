@@ -105,19 +105,23 @@ int main(int argc, const char * argv[])
     }
     LoadTestRating();
 
+    for (int td = 0; td < WORKER_NUM;  td++)
+    {
+        recvConnected[td] = false;
+        sendConnected[td] = false;
+    }
+    waitfor = true;
     for (int recv_thread_id = 0; recv_thread_id < WORKER_NUM; recv_thread_id++)
     {
-        recvConnected[recv_thread_id] = false;
         int thid = recv_thread_id;
         printf("thid=%d\n", thid );
         std::thread recv_thread(recvTd, thid);
         recv_thread.detach();
     }
-
 #ifndef STELLAR
     for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
     {
-        sendConnected[send_thread_id] = false;
+
         int thid = send_thread_id;
         std::thread send_thread(sendTd, thid);
         send_thread.detach();
@@ -304,6 +308,26 @@ int main(int argc, const char * argv[])
 }
 void PeriodicStatistics()
 {
+    while (1 == 1)
+    {
+        bool canbreak = true;
+        for (int i = 0; i < WORKER_NUM; i++)
+        {
+            if (sendConnected[i] == false)
+            {
+                canbreak = false;
+            }
+            if (recvConnected[i] == false)
+            {
+                canbreak = false;
+            }
+        }
+        if (canbreak)
+        {
+            waitfor = false;
+            break;
+        }
+    }
     ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
 
@@ -618,6 +642,7 @@ int genActivePushfd(int send_thread_id)
     while (check_ret < 0);
     printf("[Td:%d]connected %s  %d\n", send_thread_id, remote_ip, remote_port );
     send_fds[send_thread_id] = fd;
+    sendConnected[send_thread_id] = true;
     return fd;
 }
 
@@ -783,7 +808,7 @@ void ps_push()
 void sendTd(int send_thread_id)
 {
     int fd = genActivePushfd(send_thread_id);
-    sendConnected[send_thread_id] = true;
+
 
     ReqMsg* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
     int ret = -1;
