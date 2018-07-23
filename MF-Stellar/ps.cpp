@@ -333,6 +333,7 @@ void PeriodicStatistics()
             break;
         }
     }
+    /*
     ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
 
@@ -388,7 +389,7 @@ void PeriodicStatistics()
 
 
     }
-
+    **/
 }
 bool curIterFin(int curIter)
 {
