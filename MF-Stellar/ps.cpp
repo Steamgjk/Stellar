@@ -533,6 +533,12 @@ bool isReady(int block_id, int required_iter, int fd)
     //getchar();
     if (block_id < WORKER_NUM)
     {
+#ifdef SSP_MODE
+        if (required_iter > 0)
+        {
+            return true;
+        }
+#endif
         // is P block
         int pbid = block_id;
 #ifdef BSP_MODE
@@ -843,7 +849,7 @@ void sendTd(int send_thread_id)
 #ifdef DEBUG
         printf("[%d]it is asking for %d iter and pid=%d qid=%d\n", send_thread_id, msg->required_iteration, required_pid, required_qid );
 #endif
-#ifndef SSP_MODE
+
         while (1 == 1)
         {
 
@@ -856,7 +862,6 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-#endif
 #ifdef DEBUG
         printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
 #endif
