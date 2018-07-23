@@ -86,7 +86,7 @@ int send_fds[100];
 
 int main(int argc, const char * argv[])
 {
-    ofstream ofs(LOG_FILE, ios::trunc);
+    //ofstream ofs(LOG_FILE, ios::trunc);
     char* lip  = "127.0.0.1";
     for (int i = 0; i < CAP; i++)
     {
@@ -304,6 +304,7 @@ int main(int argc, const char * argv[])
 }
 void PeriodicStatistics()
 {
+    ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
     while (1 == 1)
     {
@@ -312,8 +313,6 @@ void PeriodicStatistics()
 
         waitfor = true;
         printf("Entering statistics...\n");
-        gettimeofday(&ed, 0);
-        time_span[iter_t / 10] = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
         float pmin, pmax, qmin, qmax;
         pmin = 9999999;
         qmin = 9999999;
