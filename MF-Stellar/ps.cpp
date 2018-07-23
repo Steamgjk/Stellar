@@ -306,56 +306,57 @@ void PeriodicStatistics()
 {
     ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
-    /*
+
     while (1 == 1)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(50000));
         time_units++;
+        /*
+                waitfor = true;
+                printf("Entering statistics...\n");
+                float pmin, pmax, qmin, qmax;
+                pmin = 9999999;
+                qmin = 9999999;
+                pmax = -1;
+                qmax = -1;
+                for (int ii = 0; ii < WORKER_NUM; ii++)
+                {
+                    //WriteLog(Pblocks[ii], Qblocks[ii], iter_t);
+                    for (int jj = 0; jj < Pblocks[ii].ele_num; jj++)
+                    {
+                        if (pmin > fabs(Pblocks[ii].eles[jj]))
+                        {
+                            pmin = fabs(Pblocks[ii].eles[jj]);
+                        }
+                        if (pmax < fabs(Pblocks[ii].eles[jj]))
+                        {
+                            pmax = fabs(Pblocks[ii].eles[jj]);
+                        }
 
-        waitfor = true;
-        printf("Entering statistics...\n");
-        float pmin, pmax, qmin, qmax;
-        pmin = 9999999;
-        qmin = 9999999;
-        pmax = -1;
-        qmax = -1;
-        for (int ii = 0; ii < WORKER_NUM; ii++)
-        {
-            //WriteLog(Pblocks[ii], Qblocks[ii], iter_t);
-            for (int jj = 0; jj < Pblocks[ii].ele_num; jj++)
-            {
-                if (pmin > fabs(Pblocks[ii].eles[jj]))
-                {
-                    pmin = fabs(Pblocks[ii].eles[jj]);
+                    }
+                    for (int jj = 0; jj < Qblocks[ii].ele_num; jj++)
+                    {
+                        if (qmin > fabs(Qblocks[ii].eles[jj]))
+                        {
+                            qmin = fabs(Qblocks[ii].eles[jj]);
+                        }
+                        if (qmax < fabs(Qblocks[ii].eles[jj]))
+                        {
+                            qmax = fabs(Qblocks[ii].eles[jj]);
+                        }
+                    }
+                    printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
+                    recvCount = 0;
                 }
-                if (pmax < fabs(Pblocks[ii].eles[jj]))
-                {
-                    pmax = fabs(Pblocks[ii].eles[jj]);
-                }
-
-            }
-            for (int jj = 0; jj < Qblocks[ii].ele_num; jj++)
-            {
-                if (qmin > fabs(Qblocks[ii].eles[jj]))
-                {
-                    qmin = fabs(Qblocks[ii].eles[jj]);
-                }
-                if (qmax < fabs(Qblocks[ii].eles[jj]))
-                {
-                    qmax = fabs(Qblocks[ii].eles[jj]);
-                }
-            }
-            printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
-            recvCount = 0;
-        }
-        printf("Calclating RMSE... \n");
-        float rmse = CalcRMSE();
-        ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
-        printf("time= %d\t rmse=%f\n", time_units, rmse );
-        waitfor = false;
-        getchar();
+                printf("Calclating RMSE... \n");
+                float rmse = CalcRMSE();
+                ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
+                printf("time= %d\t rmse=%f\n", time_units, rmse );
+                waitfor = false;
+            **/
+        //getchar();
     }
-    **/
+
 }
 bool curIterFin(int curIter)
 {
