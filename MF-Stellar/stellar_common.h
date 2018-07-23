@@ -60,7 +60,8 @@ using namespace std;
 //#define BSP_MODE //ini_rmse 46.41
 //#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
 #define SSP_MODE
-#define SSP_BOUND (1) //ini_rmse 46.402630
+#define SSP_BOUND (2) //ini_rmse 46.402630
+//#define SSP_BOUND (1) //ini_rmse 46.40423
 struct Block
 {
 	int block_id;
