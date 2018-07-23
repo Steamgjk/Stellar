@@ -55,7 +55,7 @@ using namespace std;
 #define FILE_NAME "/home/oneword/trainDS/"
 #define TEST_NAME "/home/oneword/validationDS"
 #endif
-
+#define DEBUG
 //#define STELLAR // ini_rmse 46.2740
 //#define BSP_MODE //ini_rmse 46.41
 //#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
