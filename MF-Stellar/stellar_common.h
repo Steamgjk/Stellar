@@ -57,7 +57,7 @@ using namespace std;
 #endif
 
 //#define STELLAR
-#define BSP_MODE //ini_rmse 46.41
+//#define BSP_MODE //ini_rmse 46.41
 #define ASP_MODE
 //#define SSP_MODE
 //#define SSP_BOUND (2)
