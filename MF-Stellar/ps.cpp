@@ -340,7 +340,7 @@ void PeriodicStatistics()
     while (1 == 1)
     {
         printf("Start to sleep...\n");
-        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50000));
         time_units++;
 
         waitfor = true;
@@ -385,10 +385,13 @@ void PeriodicStatistics()
         printf("Calclating RMSE... \n");
         float rmse = CalcRMSE();
         ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
-        printf("time= %d\t rmse=%f\n", time_units, rmse );
+        printf("time= %d\t iter_t=%d\t rmse=%f\n", time_units, iter_t, rmse );
 
         waitfor = false;
-
+        if (time_units > 15)
+        {
+            exit(0);
+        }
 
     }
 

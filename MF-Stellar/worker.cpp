@@ -224,7 +224,9 @@ void WaitforParas(int cur_iter)
     int pbid = thread_id;
     int qbid = (thread_id + cur_iter) % WORKER_NUM;
 #ifndef STELLAR
+#ifdef DEBUG
     printf("waiting for pid=%d  data-age=%d  cur_iter=%d\n", pbid, Pblocks[pbid].data_age, cur_iter  );
+#endif
 #endif
 #ifdef BSP_MODE
     while (Pblocks[pbid].data_age < cur_iter)
