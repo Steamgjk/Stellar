@@ -352,7 +352,7 @@ void PeriodicStatistics()
         ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
         printf("time= %d\t rmse=%f\n", time_units, rmse );
         waitfor = false;
-        getchar();
+        //getchar();
     }
 }
 bool curIterFin(int curIter)
