@@ -894,7 +894,7 @@ void recvTd(int recv_thread_id)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        printf("recving ...\n");
+        printf("[%d]recving ...\n", recv_thread_id);
         struct timeval st, et, recvt;
         gettimeofday(&st, 0);
         size_t expected_len = sizeof(Block);
@@ -938,7 +938,7 @@ void recvTd(int recv_thread_id)
 
         float* data_eles = (float*)(void*)dataBuf;
         int block_idx = pb->block_id ;
-        printf("recved block_idx=%d data_age=%d\n", pb->block_id. pb->data_age );
+        printf("[%d]recved block_idx=%d data_age=%d\n", recv_thread_id, pb->block_id, pb->data_age );
         if (block_idx < WORKER_NUM)
         {
 #if (defined ASP_MODE) || (defined SSP_MODE)
@@ -1053,7 +1053,7 @@ void recvTd(int recv_thread_id)
         }
         gettimeofday(&et, 0);
         long long mksp = (et.tv_sec - st.tv_sec) * 1000000 + et.tv_usec - st.tv_usec;
-        //printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
+        printf("[%d]recv success time = %lld\n", recv_thread_id, mksp );
 
     }
 }
