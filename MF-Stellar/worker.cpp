@@ -657,6 +657,7 @@ void recvTd(int recv_thread_id)
 
     while (1 == 1)
     {
+        printf("to_recv_cnt=%d has_request_cnt=%d iter_cnt=%d\n", to_recv_cnt, has_request_cnt, iter_cnt );
 #ifndef STELLAR
         if (to_recv_cnt > iter_cnt)
         {
