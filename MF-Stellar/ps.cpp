@@ -388,7 +388,7 @@ void PeriodicStatistics()
         printf("time= %d\t iter_t=%d\t rmse=%f\n", time_units, iter_t, rmse );
 
         waitfor = false;
-        if (time_units > 15)
+        if (time_units > 30)
         {
             exit(0);
         }
