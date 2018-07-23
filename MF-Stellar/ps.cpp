@@ -314,7 +314,7 @@ void PeriodicStatistics()
 
         waitfor = true;
         printf("Entering statistics...\n");
-        /*
+
         float pmin, pmax, qmin, qmax;
         pmin = 9999999;
         qmin = 9999999;
@@ -353,7 +353,7 @@ void PeriodicStatistics()
         float rmse = CalcRMSE();
         ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
         printf("time= %d\t rmse=%f\n", time_units, rmse );
-        **/
+
         waitfor = false;
 
 
