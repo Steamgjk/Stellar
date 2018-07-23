@@ -690,11 +690,15 @@ void recvTd(int recv_thread_id)
             Pblocks[pbid].ele_num = pb->ele_num;
             Pblocks[pbid].eles.resize(pb->ele_num);
             float* data_eles = (float*)(void*)dataBuf;
-            for (int i = 0; i < Pblocks[pbid].ele_num; i++)
+            if (pb->data_age > Pblocks[pbid].data_age)
             {
-                Pblocks[pbid].eles[i] = data_eles[i];
+                for (int i = 0; i < Pblocks[pbid].ele_num; i++)
+                {
+                    Pblocks[pbid].eles[i] = data_eles[i];
+                }
+                Pblocks[pbid].data_age = pb->data_age;
             }
-            Pblocks[pbid].data_age = pb->data_age;
+
 
             one_p = true;
         }
@@ -708,11 +712,15 @@ void recvTd(int recv_thread_id)
             Qblocks[qbid].ele_num = pb->ele_num;
             Qblocks[qbid].eles.resize(pb->ele_num);
             float* data_eles = (float*)(void*)dataBuf;
-            for (int i = 0; i < Qblocks[qbid].ele_num; i++)
+            if (pb->data_age > Qblocks[qbid].data_age)
             {
-                Qblocks[qbid].eles[i] = data_eles[i];
+                for (int i = 0; i < Qblocks[qbid].ele_num; i++)
+                {
+                    Qblocks[qbid].eles[i] = data_eles[i];
+                }
+                Qblocks[qbid].data_age = pb->data_age;
             }
-            Qblocks[qbid].data_age = pb->data_age;
+
             one_q = true;
         }
         free(dataBuf);
