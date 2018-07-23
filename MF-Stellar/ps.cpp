@@ -308,7 +308,7 @@ void PeriodicStatistics()
     int time_units = 0;
     while (1 == 1)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50000));
         time_units++;
 
         waitfor = true;
