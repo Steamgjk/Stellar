@@ -814,8 +814,8 @@ void ps_push()
 #endif
             gettimeofday(&sendt, 0);
             send_timestamp[pe.worker_id] = (sendt.tv_sec) * 1000000 + sendt.tv_usec;
-//sleep for several ms
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+//sleep for several ms no. not necessary
+            //std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
     }
