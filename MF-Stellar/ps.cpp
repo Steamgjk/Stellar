@@ -310,7 +310,7 @@ void PeriodicStatistics()
     while (1 == 1)
     {
         printf("Start to sleep...\n");
-        std::this_thread::sleep_for(std::chrono::milliseconds(50000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
         time_units++;
 
         waitfor = true;
