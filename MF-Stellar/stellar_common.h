@@ -1,7 +1,7 @@
 
 #ifndef STELLA_COMMON_H
 #define STELLA_COMMON_H
-
+//ini_rmse 46.41
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -57,8 +57,8 @@ using namespace std;
 #endif
 
 //#define STELLAR
-#define BSP_MODE
-//#define ASP_MODE
+#define BSP_MODE //ini_rmse 46.41
+#define ASP_MODE
 //#define SSP_MODE
 //#define SSP_BOUND (2)
 struct Block
