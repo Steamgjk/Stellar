@@ -617,7 +617,7 @@ bool isReady(int block_id, int required_iter, int fd)
         }
         else
         {
-            printf("still fail\n");
+            printf("still fail ret=%d\n errono=%d", ret, errno );
         }
         //getchar();
     }
