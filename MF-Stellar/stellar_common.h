@@ -56,11 +56,11 @@ using namespace std;
 #define TEST_NAME "/home/oneword/validationDS"
 #endif
 
-//#define STELLAR
-//#define BSP_MODE
+#define STELLAR
+#define BSP_MODE
 //#define ASP_MODE
-#define SSP_MODE
-#define SSP_BOUND (2)
+//#define SSP_MODE
+//#define SSP_BOUND (2)
 struct Block
 {
 	int block_id;
