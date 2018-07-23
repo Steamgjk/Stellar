@@ -167,7 +167,7 @@ int main(int argc, const char * argv[])
 
             WaitforParas(iter_cnt);
 
-            printf("Computing... iter %d pbid=%d qbid=%d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->block_id, Qblock_ptr->block_id, Pblock_ptr->data_age, Qblock_ptr->data_age);
+            //printf("Computing... iter %d pbid=%d qbid=%d page=%d  qage=%d\n", iter_cnt, Pblock_ptr->block_id, Qblock_ptr->block_id, Pblock_ptr->data_age, Qblock_ptr->data_age);
             submf();
 
             //printf("Pushing... iter  %d\n", iter_cnt );
@@ -670,9 +670,8 @@ void recvTd(int recv_thread_id)
 #ifndef STELLAR
         if (has_request_cnt < to_recv_cnt)
         {
-#ifdef DEBUG
-            printf("send request %d\n", to_recv_cnt );
-#endif
+            printf("[%d]send request %d\n", recv_thread_id, to_recv_cnt );
+
             // In stellar, we donot need active pull
             ret = sendPullReq(to_recv_cnt, connfd);
             has_request_cnt++;
