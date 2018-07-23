@@ -501,8 +501,10 @@ void submf()
 
         }
     **/
+#if (defined STELLAR)||(defined SSP_MODE)
     Pblock_ptr->data_age++;
     Qblock_ptr->data_age++;
+#endif
     gettimeofday(&ed, 0);
     mksp = (ed.tv_sec - beg.tv_sec) * 1000000 + ed.tv_usec - beg.tv_usec;
     //printf("Calc  time = %lld\n", mksp);

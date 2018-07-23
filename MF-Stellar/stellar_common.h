@@ -44,7 +44,7 @@ using namespace std;
 
 #define LOG_FILE "./rmse_log"
 
-#define STELLAR
+//#define STELLAR
 #define BSP_MODE
 //#define ASP_MODE
 //#define SSP_MODE
