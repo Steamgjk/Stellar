@@ -333,7 +333,7 @@ void PeriodicStatistics()
             break;
         }
     }
-    /*
+
     ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
 
@@ -344,6 +344,7 @@ void PeriodicStatistics()
         time_units++;
 
         waitfor = true;
+        /*
         printf("Entering statistics...\n");
 
         float pmin, pmax, qmin, qmax;
@@ -380,6 +381,7 @@ void PeriodicStatistics()
             printf("iter=%d pmin=%f pmax=%f qmin=%f qmax=%f\n", iter_t, pmin, pmax, qmin, qmax );
             recvCount = 0;
         }
+        **/
         printf("Calclating RMSE... \n");
         float rmse = CalcRMSE();
         ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
@@ -389,7 +391,7 @@ void PeriodicStatistics()
 
 
     }
-    **/
+
 }
 bool curIterFin(int curIter)
 {
