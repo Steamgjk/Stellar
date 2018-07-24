@@ -528,6 +528,7 @@ void recvTd(int recv_thread_id)
             {
                 pn_vec[idx].previous_score = pn_vec[idx].score;
                 pn_vec[idx].score = score_ptr[i];
+                pn_vec[idx].data_age = pb->data_age;
             }
         }
         free(sockBuf);

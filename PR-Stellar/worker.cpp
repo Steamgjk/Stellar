@@ -145,7 +145,7 @@ int main(int argc, const char * argv[])
 
 bool NeededByOutSide(int idx)
 {
-    for (int i = 0; i < pn_vec[idx].to_adj_nodes.size(); i++)
+    for (size_t i = 0; i < pn_vec[idx].to_adj_nodes.size(); i++)
     {
         if (pn_vec[idx].to_adj_nodes[i] < num_lens[worker_id] || pn_vec[idx].to_adj_nodes[i] >= num_lens[worker_id + 1])
         {
@@ -172,7 +172,7 @@ void WaitforParas(int cur_iter)
 }
 void LoadData()
 {
-    printf("loading data thread_id=%d%d\n", thread_id );
+    printf("loading data thread_id=%d\n", thread_id );
     int from_node, to_node;
     ifstream ifs(FILE_NAME);
     if (!ifs.is_open())
@@ -219,7 +219,7 @@ void CalcUpdt(int td_id)
                 if (i % WORKER_THREAD_NUM == td_id)
                 {
                     float ret_score = 0;
-                    for (int j = 0; j < pn_vec[i].from_adj_nodes.size(); j++)
+                    for (size_t j = 0; j < pn_vec[i].from_adj_nodes.size(); j++)
                     {
                         int from_node_id = pn_vec[i].from_adj_nodes[j];
                         float weight = 1.0 / pn_vec[from_node_id].to_adj_nodes.size();
@@ -362,7 +362,7 @@ int simple_push_block(int sendfd)
     size_t entry_sz = sizeof(float) * (pn.entry_num);
     size_t data_sz = idx_sz + entry_sz;
     std::vector<float> scores;
-    for (int i = 0; i < outside_vec.size(); i++)
+    for (size_t i = 0; i < outside_vec.size(); i++)
     {
         int idx = outside_vec[i];
         scores.push_back(pn_vec[idx].score);
@@ -488,6 +488,7 @@ void recvTd(int recv_thread_id)
             if (pn_vec[idx_ptr[i]].data_age < pnb->data_age)
             {
                 pn_vec[idx_ptr[i]].previous_score = pn_vec[idx_ptr[i]].score;
+                pn_vec[idx_ptr[i]].score = score_ptr[i];
                 pn_vec[idx_ptr[i]].data_age = pnb->data_age;
             }
         }
