@@ -194,7 +194,7 @@ void LoadData()
         pn_vec[to_node].data_age = 0;
         pn_vec[to_node].from_adj_nodes.push_back(from_node);
         line_cnt++;
-        if (line_cnt % 100000 == 0)
+        if (line_cnt % 1000000 == 0)
         {
             printf("Loading...%d\n", line_cnt );
         }
