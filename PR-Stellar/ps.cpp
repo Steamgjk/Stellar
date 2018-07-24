@@ -109,6 +109,10 @@ int main(int argc, const char * argv[])
 
         }
     }
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
+        printf("%d-%d\n", depended_ids[i].size(), num_lens[i + 1] - num_lens[i]);
+    }
 
     for (int td = 0; td < WORKER_NUM;  td++)
     {
@@ -126,7 +130,6 @@ int main(int argc, const char * argv[])
 #ifndef STELLAR
     for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
     {
-
         int thid = send_thread_id;
         std::thread send_thread(sendTd, thid);
         send_thread.detach();

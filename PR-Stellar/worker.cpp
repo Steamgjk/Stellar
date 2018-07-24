@@ -224,8 +224,9 @@ void CalcUpdt(int td_id)
                         int from_node_id = pn_vec[i].from_adj_nodes[j];
                         float weight = 1.0 / pn_vec[from_node_id].to_adj_nodes.size();
                         ret_score += pn_vec[from_node_id].score * weight;
+
                     }
-                    new_scores[i] = ret_score;
+                    new_scores[i] = 0.85 * ret_score + 0.15 * (pn_vec[i].score);
                 }
             }
             StartCalcUpdt[td_id] = false;
@@ -453,8 +454,7 @@ void recvTd(int recv_thread_id)
     size_t idx_sz = 0;
     size_t score_sz = 0;
 
-    int to_recv_age = 0;
-    int has_recved_age = -1;
+    int to_recv_age = 1;
     int ret = -1;
     while (1 == 1)
     {
