@@ -175,6 +175,9 @@ void LoadData()
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
         exit(-1);
     }
+    //the first line is text
+    string str;
+    getline(ifs, str);
     int line_cnt = 0;
     while (!ifs.eof())
     {
