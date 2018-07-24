@@ -232,6 +232,16 @@ void PeriodicStatistics()
     }
 
 }
+float CalcRMSE()
+{
+    float sum = 0;
+    for (int i = 0; i < PG_NUM; i++)
+    {
+        sum += (pn_vec[i].previous_score - pn_vec[i].score) * (pn_vec[i].previous_score - pn_vec[i].score);
+    }
+    float rmse = sqrt(sum / (PG_NUM));
+    return rmse;
+}
 bool curIterFin(int curIter)
 {
     if (curIter < 0)
