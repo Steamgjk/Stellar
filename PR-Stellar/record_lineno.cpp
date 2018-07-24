@@ -24,7 +24,7 @@
 #include <set>
 #include <functional>
 using namespace std;
-#define FILE_NAME "/home/shuai/oneword/out.trackers"
+#define FILE_NAME "./out.trackers"
 int main()
 {
 	ifstream ifs(FILE_NAME);
@@ -41,8 +41,8 @@ int main()
 	{
 
 		ifs >> from_node >> to_node;
-		printf("from=%d  end=%d\n", from_node, to_node );
-		getchar();
+		//printf("from=%d  end=%d\n", from_node, to_node );
+		//getchar();
 		line_cnt++;
 		if (line_cnt % 1000000 == 0)
 		{
