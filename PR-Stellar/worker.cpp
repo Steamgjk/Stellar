@@ -180,6 +180,7 @@ void LoadData()
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
         exit(-1);
     }
+    int line_cnt = 0;
     while (!ifs.eof())
     {
         ifs >> from_node >> to_node;
@@ -192,6 +193,11 @@ void LoadData()
         pn_vec[to_node].previous_score = 0;
         pn_vec[to_node].data_age = 0;
         pn_vec[to_node].from_adj_nodes.push_back(from_node);
+        line_cnt++;
+        if (line_cnt % 100000 == 0)
+        {
+            printf("Loading...%d\n", line_cnt );
+        }
     }
 
 }

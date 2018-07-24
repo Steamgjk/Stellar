@@ -85,8 +85,9 @@ int main(int argc, const char * argv[])
     {
         pn_vec.push_back(PageRankNode());
     }
+    printf("Loading data\n");
     LoadData();
-
+    printf("Load Complete\n");
     int block_units = PG_NUM / WORKER_NUM;
     for (int i = 0; i < WORKER_NUM; i++)
     {
@@ -174,6 +175,7 @@ void LoadData()
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
         exit(-1);
     }
+    int line_cnt = 0;
     while (!ifs.eof())
     {
         ifs >> from_node >> to_node;
@@ -186,6 +188,12 @@ void LoadData()
         pn_vec[to_node].previous_score = 0;
         pn_vec[to_node].data_age = 0;
         pn_vec[to_node].from_adj_nodes.push_back(from_node);
+
+        line_cnt++;
+        if (line_cnt % 100000 == 0)
+        {
+            printf("Loading...%d\n", line_cnt );
+        }
     }
 
 }
