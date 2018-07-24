@@ -28,7 +28,7 @@ using namespace std;
 #define PG_NUM (27665730+100)
 #define WORKER_NUM 16
 int num_lens[100];
-std::vector<pair<int, int>> vec[100];
+std::vector<pair<int, int> > vec[100];
 
 
 void writeFile(int worker_id)
@@ -46,7 +46,7 @@ void writeFile(int worker_id)
 			printf("[%d] write %d\n", worker_id, cnt );
 		}
 	}
-	printf("Finish-[%d]\n", idx);
+	printf("Finish-[%d]\n", worker_id);
 }
 
 int main()
