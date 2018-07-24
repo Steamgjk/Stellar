@@ -25,7 +25,6 @@
 #include <fstream>
 #include <sys/time.h>
 #include <map>
-#include <set>
 #include <functional>
 using namespace std;
 
@@ -39,7 +38,6 @@ using namespace std;
 #define ROW_UNIT (N/ROW_PS +1)
 #define COL_UNIT (M/COL_RS +1)
 
-#define PG_NUM (27665730+100)
 #define CAP 500
 #define ThreshIter 1000
 #define WORKER_THREAD_NUM 4
@@ -49,20 +47,19 @@ using namespace std;
 #define TEST_BED
 
 #ifndef TEST_BED
-#define FILE_NAME "/home/shuai/oneword/out.trackers"
+#define FILE_NAME "/home/shuai/oneword/trainDS/"
 #define TEST_NAME "/home/shuai/oneword/validationDS"
 #endif
 
 #ifdef TEST_BED
-#define FILE_NAME "/home/oneword/out.trackers"
+#define FILE_NAME "/home/oneword/trainDS/"
 #define TEST_NAME "/home/oneword/validationDS"
 #endif
-//#define STELLAR // ini_rmse 46.2740
-//#define BSP_MODE //ini_rmse 46.41
+
+#define STELLAR // ini_rmse 46.2740
+#define BSP_MODE //ini_rmse 46.41
 //#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
-#define SSP_MODE
-#define SSP_BOUND (0) //ini_rmse  46.414
-//#define SSP_BOUND (10000) //ini_rmse  46.414
+//#define SSP_MODE
 //#define SSP_BOUND (1) //ini_rmse  46.383
 //#define SSP_BOUND (2) //ini_rmse 46.414349
 //#define SSP_BOUND (3) //ini_rmse 46.40423
@@ -167,49 +164,4 @@ struct PriorityE
 
 };
 
-struct PageRankNode
-{
-	float score;
-	float previous_score;
-	std::vector<int> to_adj_nodes;
-	std::vector<int> from_adj_nodes;
-	int data_age;
-	PageRankNode()
-	{
-		previous_score = 999;
-		score = 0;
-		data_age = -1;
-	}
-	PageRankNode(float scr, int da)
-	{
-		score = scr;
-		data_age = da;
-	}
-	PageRankNode operator=(const PageRankNode& pitem)
-	{
-		previous_score = pitem.score;
-		score = pitem.score;
-		to_adj_nodes = pitem.to_adj_nodes;
-		from_adj_nodes = pitem.from_adj_nodes;
-		data_age = pitem.data_age;
-		return *this;
-	}
-
-};
-
-struct PNBlock
-{
-	int entry_num;
-	int data_age;
-	PNBlock()
-	{
-
-	}
-	PNBlock( int en, int da)
-	{
-		entry_num = en;
-		data_age = da;
-	}
-
-};
 #endif
