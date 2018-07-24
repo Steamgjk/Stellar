@@ -8,7 +8,7 @@
 #include "stellar_common.h"
 using namespace std;
 
-
+void LoadData();
 void WriteLog(Block&Pb, Block&Qb, int iter_cnt);
 int wait4connection(char*local_ip, int local_port);
 void sendTd(int send_thread_id);
@@ -41,6 +41,7 @@ bool recvConnected[100];
 std::mutex mtxes[100];
 int submitted_age[100];
 int pushed_age[100];
+int num_lens[100];
 
 int iter_t = 0;
 int iter_thresh = 10;
@@ -99,9 +100,9 @@ int main(int argc, const char * argv[])
         {
             for (int k = 0; k < pn_vec[j].from_adj_nodes.size(); k++)
             {
-                if (pn_vec[j].from_adj_nodes[k] < num_lens[worker_id] || pn_vec[j].from_adj_nodes[k] >= num_lens[worker_id + 1])
+                if (pn_vec[j].from_adj_nodes[k] < num_lens[i] || pn_vec[j].from_adj_nodes[k] >= num_lens[i + 1])
                 {
-                    depended_ids.push_back(pn_vec[j].from_adj_nodes[k]);
+                    depended_ids[i].push_back(pn_vec[j].from_adj_nodes[k]);
                 }
 
             }
@@ -163,10 +164,8 @@ int main(int argc, const char * argv[])
 
 void LoadData()
 {
-    printf("loading data thread_id=%d%d\n", thread_id );
-    char fn[100];
     int from_node, to_node;
-    ifstream ifd(FILE_NAME);
+    ifstream ifs(FILE_NAME);
     if (!ifs.is_open())
     {
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
@@ -348,10 +347,8 @@ void splice_send(int send_fd, char* buf, int len)
         else
         {
             printf("still fail\n");
-            return false;
         }
     }
-    return true;
 }
 //send only establish the fd vec, send in sequence
 
@@ -377,6 +374,7 @@ void ps_push()
     size_t idx_sz = -1;
     size_t score_sz = -1;
     size_t data_sz = -1;
+    char* buf = NULL;
 
     while (1 == 1)
     {
@@ -402,7 +400,7 @@ void ps_push()
                 score_sz = sizeof(float) * (to_send_ids[i].size());
                 data_sz = idx_sz + score_sz + struct_sz;
                 buf = (char*)malloc(data_sz);
-                PNBlock pnb(to_send_ids.size(), pushed_age[i] + 1);
+                PNBlock pnb(to_send_ids[i].size(), pushed_age[i] + 1);
                 memcpy(buf, &pnb, struct_sz);
                 int* idx_ptr = (int*)(void*)(buf + struct_sz);
                 int* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
@@ -450,8 +448,6 @@ void sendTd(int send_thread_id)
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
-        printf("[%d] iter=%d send to worker [%d] pid=%d\n", send_thread_id, msg->required_iteration, msg->worker_id, required_pid  );
-
 
     }
 
@@ -495,7 +491,7 @@ void recvTd(int recv_thread_id)
         struct PNBlock* pb = (struct PNBlock*)(void*)sockBuf;
         size_t idx_sz = sizeof(int) * (pb->entry_num);
         size_t score_sz = sizeof(float) * (pb->entry_num);
-        size_t data_sz = idx_sz + data_sz;
+        size_t data_sz = idx_sz + score_sz;
         char* dataBuf = (char*)malloc(data_sz);
         cur_len = 0;
         ret = 0;
