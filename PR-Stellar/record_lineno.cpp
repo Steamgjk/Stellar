@@ -34,6 +34,7 @@ int main()
 		exit(-1);
 	}
 	int line_cnt = 0;
+	int from_node, to_node;
 	while (!ifs.eof())
 	{
 		ifs >> from_node >> to_node;
