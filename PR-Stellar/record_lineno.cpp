@@ -35,8 +35,10 @@ int main()
 	}
 	int line_cnt = 0;
 	int from_node, to_node;
+	string str;
 	while (!ifs.eof())
 	{
+		/*
 		ifs >> from_node >> to_node;
 		printf("from=%d  end=%d\n", from_node, to_node );
 		getchar();
@@ -45,6 +47,10 @@ int main()
 		{
 			printf("Loading...%d  %d  %d\n", line_cnt, from_node, to_node );
 		}
+		**/
+		ifs >> str;
+		cout << str << endl;
+		getchar();
 
 	}
 }
