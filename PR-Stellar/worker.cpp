@@ -173,9 +173,8 @@ void WaitforParas(int cur_iter)
 void LoadData()
 {
     printf("loading data thread_id=%d%d\n", thread_id );
-    char fn[100];
     int from_node, to_node;
-    ifstream ifd(FILE_NAME);
+    ifstream ifs(FILE_NAME);
     if (!ifs.is_open())
     {
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
@@ -307,7 +306,7 @@ int push_block(int sendfd)
 {
     //printf("Td:%d cansend\n", thread_id );
     size_t struct_sz = sizeof(PNBlock);
-    PNBlock pn((num_lens[worker_id + 1] - num_lens[worker_id]), cur_iter + 1);
+    PNBlock pn((num_lens[worker_id + 1] - num_lens[worker_id]), iter_cnt + 1);
     size_t idx_sz = sizeof(int) * (pn.entry_num);
     size_t entry_sz = sizeof(float) * (pn.entry_num);
     size_t data_sz = idx_sz + entry_sz;
@@ -357,7 +356,7 @@ int push_block(int sendfd)
 int simple_push_block(int sendfd)
 {
     size_t struct_sz = sizeof(PNBlock);
-    PNBlock pn(outside_vec.size(), cur_iter + 1);
+    PNBlock pn(outside_vec.size(), iter_cnt + 1);
     size_t idx_sz = sizeof(int) * (pn.entry_num);
     size_t entry_sz = sizeof(float) * (pn.entry_num);
     size_t data_sz = idx_sz + entry_sz;
@@ -456,6 +455,7 @@ void recvTd(int recv_thread_id)
 
     int to_recv_age = 0;
     int has_recved_age = -1;
+    int ret = -1;
     while (1 == 1)
     {
         ret = sendPullReq(to_recv_age, connfd);
@@ -497,13 +497,5 @@ void recvTd(int recv_thread_id)
     }
 }
 
-int sendPullReq(int requre_iter, int fd)
-{
-    ReqMsg* rm = (ReqMsg*)malloc(sizeof(ReqMsg));
-    rm->required_iteration = requre_iter;
-    rm->worker_id = thread_id;
-    int ret = send(fd, rm, sizeof(ReqMsg), 0);
-    free(rm);
-    return ret;
-}
+
 
