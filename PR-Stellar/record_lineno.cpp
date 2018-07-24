@@ -87,6 +87,11 @@ int main()
 			printf("Loading...%d  %d  %d\n", line_cnt, from_node, to_node );
 		}
 	}
+	for (int i = 0; i < WORKER_NUM; i++)
+	{
+		printf("%d-%ld\n", i, vec[i].size() );
+	}
+	getchar();
 	printf("ok begin write\n");
 	for (int i = 0; i < WORKER_NUM; i++)
 	{
