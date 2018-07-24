@@ -38,6 +38,8 @@ int main()
 	while (!ifs.eof())
 	{
 		ifs >> from_node >> to_node;
+		printf("from=%d  end=%d\n", from_node, to_node );
+
 		line_cnt++;
 		if (line_cnt % 1000000 == 0)
 		{
