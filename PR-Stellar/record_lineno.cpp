@@ -80,6 +80,7 @@ int main()
 				vec[i].push_back(pair<int, int>(from_node, to_node));
 			}
 		}
+
 		line_cnt++;
 		if (line_cnt % 1000000 == 0)
 		{
