@@ -39,7 +39,7 @@ int main()
 	{
 		ifs >> from_node >> to_node;
 		printf("from=%d  end=%d\n", from_node, to_node );
-
+		getchar();
 		line_cnt++;
 		if (line_cnt % 1000000 == 0)
 		{
