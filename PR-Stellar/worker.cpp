@@ -21,6 +21,8 @@ int push_block(int sendfd, Block& blk);
 void WaitforParas(int cur_iter);
 int genPushTd(int send_thread_id);
 bool NeededByOutSide(int idx);
+int simple_push_block(int sendfd);
+
 
 int WORKER_NUM = 1;
 /**Yahoo!Music**/
