@@ -403,7 +403,7 @@ void ps_push()
                 PNBlock pnb(to_send_ids[i].size(), pushed_age[i] + 1);
                 memcpy(buf, &pnb, struct_sz);
                 int* idx_ptr = (int*)(void*)(buf + struct_sz);
-                int* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
+                float* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
                 for (int ii = 0; ii < to_send_ids[i].size(); ii++)
                 {
                     int idx = to_send_ids[i][ii];
