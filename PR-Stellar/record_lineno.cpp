@@ -41,7 +41,7 @@ int main()
 		line_cnt++;
 		if (line_cnt % 1000000 == 0)
 		{
-			printf("Loading...%d\n", line_cnt );
+			printf("Loading...%d  %d  %d\n", line_cnt, from_node, to_node );
 		}
 
 	}
