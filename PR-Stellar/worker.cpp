@@ -522,7 +522,8 @@ void recvTd(int recv_thread_id)
         float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
         int idx = 0;
         printf("oooooo....\n");
-        printf("pnb %d\n", pnb->entry_num );
+        printf("[%d]pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
+        getchar();
         for (int i = 0; i < pnb->entry_num; i++)
         {
             idx -= idx_ptr[i] - num_lens[worker_id];
