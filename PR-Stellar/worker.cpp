@@ -140,14 +140,14 @@ int main(int argc, const char * argv[])
             printf("waiting for Paras iter_cnt=%d\n", iter_cnt);
             WaitforParas(iter_cnt);
             submf();
-            printf("Pushing... iter  %d\n", iter_cnt );
+            printf("Pushing-A... iter  %d\n", iter_cnt );
 #ifndef STELLAR
             simple_push_block(push_fd);
 #else
             getchar();
             push_block(push_fd);
 #endif
-            printf("Pushed... iter %d\n", iter_cnt);
+            printf("Pushed-1... iter %d\n", iter_cnt);
             iter_cnt++;
         }
     }
