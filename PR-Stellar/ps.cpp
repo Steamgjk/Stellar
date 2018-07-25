@@ -228,9 +228,15 @@ void PeriodicStatistics()
         if (canbreak)
         {
             waitfor = false;
+
             break;
         }
+        else
+        {
+            printf("Cannot break;\n");
+        }
     }
+    printf("All Connected!\n");
     ofstream ofs(LOG_FILE, ios::trunc);
     int time_units = 0;
 
