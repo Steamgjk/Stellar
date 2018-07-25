@@ -249,7 +249,7 @@ void CalcUpdt(int td_id)
     {
         if (StartCalcUpdt[td_id] == true)
         {
-            printf("[%d]new_scores.sz=%ld\n", td_id, new_scores.size() );
+            //printf("[%d]new_scores.sz=%ld\n", td_id, new_scores.size() );
             for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
             {
                 if (i % WORKER_THREAD_NUM == td_id)
@@ -265,7 +265,7 @@ void CalcUpdt(int td_id)
                     tmp_scores[idx] = 0.85 * ret_score + 0.15 * (pn_vec[idx].score);
                 }
             }
-            printf("[%d]Calc Ok\n", td_id);
+            //printf("[%d]Calc Ok\n", td_id);
             StartCalcUpdt[td_id] = false;
         }
     }
@@ -371,7 +371,7 @@ int push_block(int sendfd)
     int ret = -1;
     size_t to_send_len = 4096;
     //gettimeofday(&st, 0);
-    printf("will send  age=%d\n", pn.data_age);
+    //printf("will send  age=%d\n", pn.data_age);
     while (remain_len > 0)
     {
         if (to_send_len > remain_len)
@@ -508,7 +508,7 @@ void recvTd(int recv_thread_id)
     while (1 == 1)
     {
 #ifndef STELLAR
-        printf("[%d]sending request to_recv_age=%d\n", worker_id, to_recv_age );
+        //printf("[%d]sending request to_recv_age=%d\n", worker_id, to_recv_age );
         ret = sendPullReq(to_recv_age, connfd);
 #endif
         size_t cur_len = 0;
@@ -538,7 +538,7 @@ void recvTd(int recv_thread_id)
             float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
             int idx = 0;
 
-            printf("[%d]recved pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
+            // printf("[%d]recved pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
             //getchar();
             for (int i = 0; i < pnb->entry_num; i++)
             {
@@ -570,7 +570,7 @@ void recvTd(int recv_thread_id)
         recved_data_age++;
 
         to_recv_age++;
-        printf("[%d]recved data_age=%d  to_recv_age=%d\n", recv_thread_id, recved_data_age, to_recv_age);
+        //printf("[%d]recved data_age=%d  to_recv_age=%d\n", recv_thread_id, recved_data_age, to_recv_age);
     }
 }
 

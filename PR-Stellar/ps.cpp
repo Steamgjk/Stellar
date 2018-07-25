@@ -290,7 +290,7 @@ void PeriodicStatistics()
     {
 
         printf("Start to sleep...\n");
-        std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50000));
         time_units++;
 
         waitfor = true;
@@ -649,8 +649,8 @@ void recvTd(int recv_thread_id)
                 }
             }
             submitted_age[recv_thread_id]++;
-            if (recv_thread_id == 0 || recv_thread_id == 1)
-                printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
+            //if (recv_thread_id == 0 || recv_thread_id == 1)
+            //  printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
             free(dataBuf);
         }
 
