@@ -115,7 +115,7 @@ int main(int argc, const char * argv[])
             ifs.close();
             //printf("%s read\n", filename );
             //getchar();
-            sprintf(filename, "./PS-track/Qblock-%d-%d", i, j);
+            sprintf(filename, "./PS-track/Qblock-%d-%d", i, j + WORKER_NUM);
             //ifstream ifs1(filename, ios::in | ios::out);
             ifs.open(filename, ios::in | ios::out);
             if (!ifs.is_open())
