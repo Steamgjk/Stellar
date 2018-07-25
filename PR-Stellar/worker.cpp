@@ -80,7 +80,7 @@ int main(int argc, const char * argv[])
         num_lens[i] = i * block_units;
     }
     num_lens[WORKER_NUM] = PG_NUM;
-
+    recved_data_age = 0;
     for (int i = 0; i < WORKER_THREAD_NUM; i++)
     {
         StartCalcUpdt[i] = (false);
@@ -542,6 +542,8 @@ void recvTd(int recv_thread_id)
             new_scores[idx] = score_ptr[i];
         }
         free(dataBuf);
+
+        recved_data_age++;
 
         to_recv_age++;
     }
