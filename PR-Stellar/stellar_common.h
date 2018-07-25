@@ -61,13 +61,13 @@ using namespace std;
 #endif
 //#define STELLAR // ini_rmse 46.2740
 //#define BSP_MODE //ini_rmse 46.41
-//#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
-#define SSP_MODE
+#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
+//#define SSP_MODE
 //#define SSP_BOUND (0) //ini_rmse  46.414
 //#define SSP_BOUND (10000) //ini_rmse  46.414
 //#define SSP_BOUND (1) //ini_rmse  46.383
 //#define SSP_BOUND (2) //ini_rmse 46.414349
-#define SSP_BOUND (3) //ini_rmse 46.40423
+//#define SSP_BOUND (3) //ini_rmse 46.40423
 struct Block
 {
 	int block_id;

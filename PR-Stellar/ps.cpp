@@ -464,8 +464,9 @@ void ps_push()
                 {
                     int idx = to_send_ids[i][ii];
                     idx_ptr[ii] = idx;
-                    score_ptr[ii] = pn_vec[idx].score;
+                    score_ptr[ii] = pn_vec[idx].score / pn_vec[idx].to_adj_nodes.size();
                 }
+                printf("splice sending.. worker-id=%d sz=%ld\n",  i, to_send_ids[i].size());
                 splice_send(send_fds[i], buf, data_sz);
                 free(buf);
                 pushed_age[i]++;

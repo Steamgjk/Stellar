@@ -87,7 +87,7 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < PG_NUM; i++)
     {
-        new_scores.push_back(1.0 / PG_NUM);
+        new_scores.push_back(100000000.0 / PG_NUM);
         //pn_vec.push_back(PageRankNode());
     }
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
