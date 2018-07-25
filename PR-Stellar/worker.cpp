@@ -144,6 +144,7 @@ int main(int argc, const char * argv[])
 #ifndef STELLAR
             simple_push_block(push_fd);
 #else
+            getchar();
             push_block(push_fd);
 #endif
             printf("Pushed... iter %d\n", iter_cnt);

@@ -229,12 +229,7 @@ void PeriodicStatistics()
         if (canbreak)
         {
             waitfor = false;
-
             break;
-        }
-        else
-        {
-            printf("Cannot break;\n");
         }
     }
     printf("All Connected!\n");
