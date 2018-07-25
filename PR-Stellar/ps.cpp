@@ -425,6 +425,10 @@ void ps_push()
             break;
         }
     }
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
+        pushed_age[i] = 1;
+    }
     printf("start ps push\n");
     size_t struct_sz = sizeof(PNBlock);
     size_t idx_sz = -1;
@@ -442,10 +446,11 @@ void ps_push()
         int idx = -1;
         for (int i = 0; i < WORKER_NUM; i++)
         {
+
             for (int j = 0; j < depended_ids[i].size(); j++)
             {
                 idx = depended_ids[i][j];
-                if (pn_vec[idx].data_age > pushed_age[i])
+                if (pn_vec[idx].data_age >= pushed_age[i])
                 {
                     to_send_ids[i].push_back(idx);
                 }
@@ -458,14 +463,18 @@ void ps_push()
                 buf = (char*)malloc(data_sz);
                 PNBlock pnb(to_send_ids[i].size(), pushed_age[i] + 1);
                 memcpy(buf, &pnb, struct_sz);
-                int* idx_ptr = (int*)(void*)(buf + struct_sz);
-                float* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
-                for (int ii = 0; ii < to_send_ids[i].size(); ii++)
+                if (score_sz > 0)
                 {
-                    int idx = to_send_ids[i][ii];
-                    idx_ptr[ii] = idx;
-                    score_ptr[ii] = pn_vec[idx].score / pn_vec[idx].to_adj_nodes.size();
+                    int* idx_ptr = (int*)(void*)(buf + struct_sz);
+                    float* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
+                    for (int ii = 0; ii < to_send_ids[i].size(); ii++)
+                    {
+                        int idx = to_send_ids[i][ii];
+                        idx_ptr[ii] = idx;
+                        score_ptr[ii] = pn_vec[idx].score / pn_vec[idx].to_adj_nodes.size();
+                    }
                 }
+
                 printf("splice sending.. worker-id=%d sz=%ld\n",  i, to_send_ids[i].size());
                 splice_send(send_fds[i], buf, data_sz);
                 free(buf);
@@ -550,39 +559,44 @@ void recvTd(int recv_thread_id)
             //printf("cur_len=%d expected_len=%d\n", cur_len, expected_len );
         }
         struct PNBlock* pb = (struct PNBlock*)(void*)sockBuf;
-        size_t idx_sz = sizeof(int) * (pb->entry_num);
-        size_t score_sz = sizeof(float) * (pb->entry_num);
-        size_t data_sz = idx_sz + score_sz;
-        char* dataBuf = (char*)malloc(data_sz);
-        cur_len = 0;
-        ret = 0;
-        //printf("pb ele_num %d\n", pb->ele_num );
-        while (cur_len < data_sz)
+        if (pnb->entry_num > 0)
         {
-            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
-            if (ret < 0)
+            size_t idx_sz = sizeof(int) * (pb->entry_num);
+            size_t score_sz = sizeof(float) * (pb->entry_num);
+            size_t data_sz = idx_sz + score_sz;
+            char* dataBuf = (char*)malloc(data_sz);
+            cur_len = 0;
+            ret = 0;
+            //printf("pb ele_num %d\n", pb->ele_num );
+            while (cur_len < data_sz)
             {
-                printf("Mimatch!\n");
+                ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
+                if (ret < 0)
+                {
+                    printf("Mimatch!\n");
+                }
+                cur_len += ret;
+                // printf("cur_len=%d data_sz=%d\n", cur_len, data_sz );
             }
-            cur_len += ret;
-            // printf("cur_len=%d data_sz=%d\n", cur_len, data_sz );
-        }
-        int* idx_ptr = (int*)(void*)dataBuf;
-        float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
-        for (int i = 0; i < pb->entry_num; i++)
-        {
-            int idx = idx_ptr[i];
-            if (pn_vec[idx].data_age < pb->data_age)
+            int* idx_ptr = (int*)(void*)dataBuf;
+            float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
+            for (int i = 0; i < pb->entry_num; i++)
             {
-                pn_vec[idx].previous_score = pn_vec[idx].score;
-                pn_vec[idx].score = score_ptr[i];
-                pn_vec[idx].data_age = pb->data_age;
+                int idx = idx_ptr[i];
+                if (pn_vec[idx].data_age < pb->data_age)
+                {
+                    pn_vec[idx].previous_score = pn_vec[idx].score;
+                    pn_vec[idx].score = score_ptr[i];
+                    pn_vec[idx].data_age = pb->data_age;
+                }
             }
+            submitted_age[recv_thread_id]++;
+            //printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
+            free(dataBuf);
         }
-        submitted_age[recv_thread_id]++;
-        //printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
+
         free(sockBuf);
-        free(dataBuf);
+
 
 
     }

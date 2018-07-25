@@ -407,8 +407,12 @@ int simple_push_block(int sendfd)
     }
     char* buf = (char*)malloc(struct_sz + data_sz);
     memcpy(buf, &(pn), struct_sz);
-    memcpy(buf + struct_sz, (char*) & (outside_vec[0]), idx_sz);
-    memcpy(buf + struct_sz + idx_sz, (char*) & (scores[0]), entry_sz);
+    if (pn.entry_num > 0)
+    {
+        memcpy(buf + struct_sz, (char*) & (outside_vec[0]), idx_sz);
+        memcpy(buf + struct_sz + idx_sz, (char*) & (scores[0]), entry_sz);
+    }
+
 
     size_t total_len = struct_sz + data_sz;
     size_t sent_len = 0;
@@ -504,51 +508,56 @@ void recvTd(int recv_thread_id)
         ret = recv(connfd, blockbuf, struct_sz, 0);
         struct PNBlock* pnb = (struct PNBlock*)(void*)blockbuf;
 
-        idx_sz = sizeof(int) * (pnb->entry_num);
-        score_sz = sizeof(float) * (pnb->entry_num);
-        data_sz = idx_sz + score_sz;
-        dataBuf = (char*)malloc(data_sz);
-        cur_len = 0;
-        ret = 0;
-        while (cur_len < data_sz)
+        if (pnb->entry_num > 0)
         {
-            //printf("recving 2\n");
-            ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
-            if (ret < 0)
+            idx_sz = sizeof(int) * (pnb->entry_num);
+            score_sz = sizeof(float) * (pnb->entry_num);
+            data_sz = idx_sz + score_sz;
+            dataBuf = (char*)malloc(data_sz);
+            cur_len = 0;
+            ret = 0;
+            while (cur_len < data_sz)
             {
-                printf("Mimatch!\n");
+                //printf("recving 2\n");
+                ret = recv(connfd, dataBuf + cur_len, data_sz - cur_len, 0);
+                if (ret < 0)
+                {
+                    printf("Mimatch!\n");
+                }
+                cur_len += ret;
             }
-            cur_len += ret;
-        }
-        int* idx_ptr = (int*)(void*)dataBuf;
-        float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
-        int idx = 0;
+            int* idx_ptr = (int*)(void*)dataBuf;
+            float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
+            int idx = 0;
 
-        printf("[%d]pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
-        //getchar();
-        for (int i = 0; i < pnb->entry_num; i++)
-        {
-            //idx = idx_ptr[i] - num_lens[worker_id];
-            //printf("idx=%d  ori=%d  base=%d sz =%d\n", idx, idx_ptr[i], num_lens[worker_id], pn_vec.size() );
-            /*
-            if (pn_vec[idx].data_age < pnb->data_age)
+            printf("[%d]pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
+            //getchar();
+            for (int i = 0; i < pnb->entry_num; i++)
             {
-                pn_vec[idx].previous_score = pn_vec[idx].score;
-                pn_vec[idx].score = score_ptr[i];
-                pn_vec[idx].data_age = pnb->data_age;
+                //idx = idx_ptr[i] - num_lens[worker_id];
+                //printf("idx=%d  ori=%d  base=%d sz =%d\n", idx, idx_ptr[i], num_lens[worker_id], pn_vec.size() );
+                /*
+                if (pn_vec[idx].data_age < pnb->data_age)
+                {
+                    pn_vec[idx].previous_score = pn_vec[idx].score;
+                    pn_vec[idx].score = score_ptr[i];
+                    pn_vec[idx].data_age = pnb->data_age;
+                }
+                **/
+                idx = idx_ptr[i];
+                new_scores[idx] = score_ptr[i];
+                /*
+                if (new_scores[idx] > 1)
+                {
+                    printf("idx=%d i=%d score=%f\n", idx, i, new_scores[idx] );
+                    getchar();
+                }
+                **/
             }
-            **/
-            idx = idx_ptr[i];
-            new_scores[idx] = score_ptr[i];
-            /*
-            if (new_scores[idx] > 1)
-            {
-                printf("idx=%d i=%d score=%f\n", idx, i, new_scores[idx] );
-                getchar();
-            }
-            **/
+            free(dataBuf);
         }
-        free(dataBuf);
+
+
 
         recved_data_age++;
 
