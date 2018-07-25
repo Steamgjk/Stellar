@@ -124,6 +124,11 @@ int main(int argc, const char * argv[])
 
         }
     }
+    printf("sampling\n");
+    for (int i = 0; i < 20; i++)
+    {
+        printf("%d\t", depended_ids[0][i]);
+    }
     for (int i = 0; i < WORKER_NUM; i++)
     {
         for (int j = 0; j < WORKER_NUM; j++)
@@ -154,6 +159,7 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < WORKER_NUM; i++)
     {
+        printf("WOrker %d:\n", i);
         for (int j = 0; j < dependedPUs[i].size(); j++)
         {
             printf("%d\t", dependedPUs[i][j]);
