@@ -156,9 +156,10 @@ int main(int argc, const char * argv[])
 
     std::thread ps_push_td(ps_push);
     ps_push_td.detach();
+
+#endif
     std::thread periodic_td(PeriodicStatistics);
     periodic_td.detach();
-#endif
     iter_t = 0;
     while (1 == 1)
     {
