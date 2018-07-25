@@ -187,7 +187,7 @@ int main(int argc, const char * argv[])
                 printf("iter_cnt=%d check_points=%d\n", iter_cnt, check_points[log_idx] );
                 if (iter_cnt == check_points[log_idx])
                 {
-                    WriteLog(*Pblock_ptr, *Qblock_ptr, iter_cnt);
+                    //WriteLog(*Pblock_ptr, *Qblock_ptr, iter_cnt);
                     log_idx++;
                 }
             }
