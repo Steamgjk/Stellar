@@ -60,7 +60,7 @@ using namespace std;
 #define PS_FILE "/home/oneword/out.trackers"
 #endif
 
-//#define STELLAR // ini_rmse 46.2740
+#define STELLAR // ini_rmse 46.2740
 #define BSP_MODE //ini_rmse 46.41
 //#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
 //#define SSP_MODE
