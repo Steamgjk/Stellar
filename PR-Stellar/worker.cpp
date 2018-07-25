@@ -213,7 +213,7 @@ void LoadData()
         if (to_node >= num_lens[worker_id] && to_node < num_lens[worker_id + 1])
         {
             int idx = to_node - num_lens[worker_id];
-            pn_vec[idx].from_adj_nodes.push_back(to_node);
+            pn_vec[idx].from_adj_nodes.push_back(from_node);
         }
 
         line_cnt++;
