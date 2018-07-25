@@ -495,15 +495,15 @@ void ps_push()
         int idx = -1;
         for (int wi = 0; wi < 100; wi++)
         {
-            int i = wi % 4;
+            int i = wi % 5;
             bool ok = true;
             for (int j = 0; j < dependedPUs[i].size(); j++)
             {
                 int dep_pu = dependedPUs[i][j];
                 if (submitted_age[dep_pu] <= pushed_age[i])
                 {
-                    if (i == 1 || i == 0)
-                        printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
+
+                    printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
                     ok = false;
                 }
             }
@@ -543,8 +543,6 @@ void ps_push()
                 int dep_pu = dependedPUs[i][j];
                 if (submitted_age[dep_pu] <= pushed_age[i])
                 {
-                    if (i == 1 || i == 0)
-                        printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
                     ok = false;
                 }
             }
