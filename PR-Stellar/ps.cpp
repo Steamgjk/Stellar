@@ -248,7 +248,7 @@ void PeriodicStatistics()
 
         float rmse = CalcRMSE();
         ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
-        printf("time= %d\t rmse=%f\n", time_units, rmse );
+        printf("time= %d\t iter_t=%d rmse=%f\n", time_units, iter_t, rmse );
 
         waitfor = false;
 
