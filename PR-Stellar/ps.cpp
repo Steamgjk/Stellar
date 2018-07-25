@@ -138,7 +138,7 @@ int main(int argc, const char * argv[])
             bool i_need_j = false;
             for (int k = 0; k < depended_ids[i].size(); i++)
             {
-                if (j == 1)
+                if (j == 0)
                 {
                     printf("i=%d k=%d dp=%d num %d %d  dp00=%d\n", i, k, depended_ids[i][k], num_lens[j], num_lens[j + 1], depended_ids[0][0] );
                     getchar();
@@ -146,7 +146,7 @@ int main(int argc, const char * argv[])
                 if (depended_ids[i][k] >= num_lens[j] && depended_ids[i][k] < num_lens[j + 1] )
                 {
                     i_need_j = true;
-                    printf("TRUEW\n");
+                    printf("TRUEW i=%d  j=%d\n", i, j);
                     break;
                 }
 
