@@ -503,9 +503,10 @@ void recvTd(int recv_thread_id)
     int ret = -1;
     while (1 == 1)
     {
+#ifndef STELLAR
         printf("[%d]sending request to_recv_age=%d\n", worker_id, to_recv_age );
         ret = sendPullReq(to_recv_age, connfd);
-
+#endif
         size_t cur_len = 0;
         printf("[%d] recving...\n", recv_thread_id );
         ret = recv(connfd, blockbuf, struct_sz, 0);

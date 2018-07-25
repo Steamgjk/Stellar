@@ -468,7 +468,7 @@ void ps_push()
                     to_send_ids[i].push_back(idx);
                 }
             }
-            if (to_send_ids[i].size() == depended_ids[i].size())
+            if (to_send_ids[i].size() > 0)
             {
                 idx_sz = sizeof(int) * (to_send_ids[i].size());
                 score_sz = sizeof(float) * (to_send_ids[i].size());
