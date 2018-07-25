@@ -115,7 +115,7 @@ int main(int argc, const char * argv[])
             }
             for (int k = 0; k < pn_vec[j].to_adj_nodes.size(); k++)
             {
-                if (pn_vec[j].to_adj_nodes[k] < num_lens[i] || pn_vec[j].to_nodes[k] >= num_lens[i + 1])
+                if (pn_vec[j].to_adj_nodes[k] < num_lens[i] || pn_vec[j].to_adj_nodes[k] >= num_lens[i + 1])
                 {
                     outside_ids[i].push_back(pn_vec[j].to_adj_nodes[k]);
                 }
