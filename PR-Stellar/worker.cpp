@@ -87,7 +87,7 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < PG_NUM; i++)
     {
-        new_scores.push_back(0);
+        new_scores.push_back(1.0 / PG_NUM);
         //pn_vec.push_back(PageRankNode());
     }
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
@@ -97,8 +97,8 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < num_lens[worker_id + 1] - num_lens[worker_id]; i++ )
     {
-        pn_vec[i].previous_score = 0;
-        pn_vec[i].score = 0;
+        pn_vec[i].previous_score = 1.0 / PG_NUM;
+        pn_vec[i].score = 1.0 / PG_NUM;
         pn_vec[i].data_age = 0;
     }
     printf("Init Over\n");
@@ -365,7 +365,7 @@ int push_block(int sendfd)
     int ret = -1;
     size_t to_send_len = 4096;
     //gettimeofday(&st, 0);
-    printf("will send\n");
+    printf("will send  age=%d\n", pn.data_age);
     while (remain_len > 0)
     {
         if (to_send_len > remain_len)
@@ -523,7 +523,7 @@ void recvTd(int recv_thread_id)
         int* idx_ptr = (int*)(void*)dataBuf;
         float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
         int idx = 0;
-        printf("oooooo....\n");
+
         printf("[%d]pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
         //getchar();
         for (int i = 0; i < pnb->entry_num; i++)

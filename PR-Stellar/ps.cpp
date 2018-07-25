@@ -291,12 +291,14 @@ bool isReady(int worker_id, int required_iter, int fd)
 #ifdef BSP_MODE
     if (!curIterFin(required_iter - 1))
     {
+        /*
         printf("%d iter cannot send to worker %d\n", required_iter, worker_id );
         for (int ll = 0; ll < WORKER_NUM; ll++)
         {
             printf("%d\t", submitted_age[ll]);
         }
         printf("\n");
+        **/
         return false;
     }
 
@@ -562,7 +564,7 @@ void recvTd(int recv_thread_id)
             }
         }
         submitted_age[recv_thread_id]++;
-        printf("[%d]recved data\n", recv_thread_id);
+        printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
         free(sockBuf);
         free(dataBuf);
 
