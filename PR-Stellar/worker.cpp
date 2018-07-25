@@ -87,7 +87,17 @@ int main(int argc, const char * argv[])
     for (int i = 0; i < PG_NUM; i++)
     {
         new_scores.push_back(0);
+        //pn_vec.push_back(PageRankNode());
+    }
+    for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
+    {
         pn_vec.push_back(PageRankNode());
+    }
+    for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
+    {
+        pn_vec[i].previous_score = 0;
+        pn_vec[i].score = 0;
+        pn_vec[i].data_age = 0;
     }
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
     {
@@ -174,29 +184,34 @@ void LoadData()
 {
     printf("loading data thread_id=%d\n", thread_id );
     int from_node, to_node;
-    ifstream ifs(FILE_NAME);
+    char fn[100];
+    sprintf(fn, "%s%d", FILE_NAME, worker_id);
+    ifstream ifs(fn);
     if (!ifs.is_open())
     {
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
         exit(-1);
     }
 //the first line is text
-    string str;
-    getline(ifs, str);
+    //string str;
+    //getline(ifs, str);
 
     int line_cnt = 0;
     while (!ifs.eof())
     {
         ifs >> from_node >> to_node;
-        pn_vec[from_node].score = 0;
-        pn_vec[from_node].previous_score = 0;
-        pn_vec[from_node].data_age = 0;
-        pn_vec[from_node].to_adj_nodes.push_back(to_node);
 
-        pn_vec[to_node].score = 0;
-        pn_vec[to_node].previous_score = 0;
-        pn_vec[to_node].data_age = 0;
-        pn_vec[to_node].from_adj_nodes.push_back(from_node);
+        if (from_node >= num_lens[worker_id] && from_node < num_lens[worker_id + 1])
+        {
+            int idx = from_node - num_lens[worker_id];
+            pn_vec[idx].to_adj_nodes.push_back(to_node);
+        }
+        if (to_node >= num_lens[worker_id] && to_node < num_lens[worker_id + 1])
+        {
+            int idx = to_node - num_lens[worker_id];
+            pn_vec[idx].from_adj_nodes.push_back(to_node);
+        }
+
         line_cnt++;
         if (line_cnt % 1000000 == 0)
         {
@@ -228,15 +243,15 @@ void CalcUpdt(int td_id)
             {
                 if (i % WORKER_THREAD_NUM == td_id)
                 {
+                    int idx = i - num_lens[worker_id];
                     float ret_score = 0;
-                    for (size_t j = 0; j < pn_vec[i].from_adj_nodes.size(); j++)
+                    for (size_t j = 0; j < pn_vec[idx].from_adj_nodes.size(); j++)
                     {
                         int from_node_id = pn_vec[i].from_adj_nodes[j];
-                        float weight = 1.0 / pn_vec[from_node_id].to_adj_nodes.size();
-                        ret_score += pn_vec[from_node_id].score * weight;
+                        ret_score += new_scores[from_node_id];
 
                     }
-                    new_scores[i] = 0.85 * ret_score + 0.15 * (pn_vec[i].score);
+                    new_scores[i] = 0.85 * ret_score + 0.15 * (pn_vec[idx].score);
                 }
             }
             StartCalcUpdt[td_id] = false;

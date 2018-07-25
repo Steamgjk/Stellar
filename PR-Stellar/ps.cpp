@@ -310,7 +310,7 @@ bool isReady(int worker_id, int required_iter, int fd)
     for (int i = 0; i < PG_NUM; i++)
     {
         idx_ptr[i] = i;
-        score_ptr[i] = pn_vec[i].score;
+        score_ptr[i] = pn_vec[i].score / pn_vec[i].to_adj_nodes.size();
     }
     splice_send(fd, buf, data_sz);
     free(buf);

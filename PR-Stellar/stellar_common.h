@@ -49,7 +49,7 @@ using namespace std;
 //#define TEST_BED
 
 #ifndef TEST_BED
-#define FILE_NAME "./out.trackers"
+#define FILE_NAME "/home/shuai/oneword/PRDS/PRData-"
 #define TEST_NAME "/home/shuai/oneword/validationDS"
 #endif
 

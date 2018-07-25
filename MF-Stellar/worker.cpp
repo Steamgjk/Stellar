@@ -60,6 +60,7 @@ long long load_time;
 long long loadTimes[2000];
 int pull_fd, push_fd;
 
+int check_points[40] = {2, 7, 13, 18, 24, 30, 36, 41, 47, 53, 60, 65, 70, 75, 82, 87, 93, 98, 104, 110, 116, 122, 127, 133, 138, 144, 149, 156, 162, 167, 173};
 int main(int argc, const char * argv[])
 {
 #ifndef TEST_BED
@@ -148,6 +149,7 @@ int main(int argc, const char * argv[])
     }
     printf("detached well\n");
 
+    int log_idx = 0;
     while (1 == 1)
     {
         //printf(" hasRecved? %d\n", hasRecved);
@@ -179,35 +181,16 @@ int main(int argc, const char * argv[])
 //#ifdef DEBUG
             printf("Pushed... iter %d\n", iter_cnt);
 //#endif
+
+            if (log_idx <= 30)
+            {
+                if (iter_cnt == check_points[log_idx++])
+                {
+                    WriteLog(*Pblock_ptr, *Qblock_ptr, iter_cnt);
+                }
+            }
             iter_cnt++;
-            if (1 == 0)
-            {
-                //WriteLog(Pblock, Qblock, iter_cnt);
-                calcTimes[iter_cnt / 10] = calc_time;
-                loadTimes[iter_cnt / 10] = load_time;
-            }
-            if (1 == 0)
-            {
-                for (int i = 0; i <= 100; i++)
-                {
-                    printf("%lld\n", calcTimes[i] );
-                }
-                for (int i = 0; i <= 100; i++)
-                {
-                    printf("%lld\n", loadTimes[i] );
-                }
-                //exit(0);
-            }
 
-            if (1 == 0 )
-            {
-                gettimeofday(&stop, 0);
-
-                long long mksp = (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec;
-                printf("itercnt = %d  time = %lld\n", iter_cnt, mksp);
-                //WriteLog(Pblock, Qblock, iter_cnt);
-                //exit(0);
-            }
             canSend = true;
             //printf("canSend = true\n");
             hasRecved = false;
@@ -637,6 +620,7 @@ int sendPullReq(int requre_iter, int fd)
     rm->required_iteration = requre_iter;
     rm->worker_id = thread_id;
     int ret = send(fd, rm, sizeof(ReqMsg), 0);
+    free(rm);
     return ret;
 }
 //pull
