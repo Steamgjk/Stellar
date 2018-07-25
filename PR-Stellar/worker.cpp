@@ -154,8 +154,9 @@ int main(int argc, const char * argv[])
 
 }
 
-bool NeededByOutSide(int idx)
+bool NeededByOutSide(int node_id)
 {
+    int idx = node_id - num_lens[worker_id];
     for (size_t i = 0; i < pn_vec[idx].to_adj_nodes.size(); i++)
     {
         if (pn_vec[idx].to_adj_nodes[i] < num_lens[worker_id] || pn_vec[idx].to_adj_nodes[i] >= num_lens[worker_id + 1])
