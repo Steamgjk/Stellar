@@ -17,7 +17,7 @@ void WriteLog(Block&Pb, Block&Qb, int iter_cnt);
 void CalcUpdt(int thread_id);
 void LoadData();
 int sendPullReq(int requre_iter, int fd);
-int push_block(int sendfd, Block& blk);
+int push_block(int sendfd);
 void WaitforParas(int cur_iter);
 int genPushTd(int send_thread_id);
 bool NeededByOutSide(int idx);
