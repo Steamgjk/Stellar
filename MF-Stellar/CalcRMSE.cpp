@@ -164,8 +164,8 @@ int main(int argc, const char * argv[])
             {
                 sum += (P[user_id][ii] * 10) * (Q[ii][movie_id] * 10);
             }
-            printf("user_id=%d movie_id=%d rate=%f sum=%f\n", user_id, movie_id, rate, sum  );
-            getchar();
+            //printf("user_id=%d movie_id=%d rate=%f sum=%f\n", user_id, movie_id, rate, sum  );
+            //getchar();
             rmse += (rate - sum) * (rate - sum);
 
 
