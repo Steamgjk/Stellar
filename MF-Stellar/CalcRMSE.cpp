@@ -160,26 +160,21 @@ int main(int argc, const char * argv[])
             {
                 printf("test_cnt=%d\n",  test_cnt);
             }
-            for (cnt = 0; cnt < ele_num; cnt++)
-            {
-                user_id = vec_uids[cnt];
-                movie_id = vec_mids[cnt];
-                rate = vec_rates[cnt];
 
-                float sum = 0;
-                for (int ii = 0; ii < K; ii++)
-                {
-                    sum += (P[user_id][ii] * 10) * (Q[ii][movie_id] * 10);
-                }
-                printf("user_id=%d movie_id=%d rate=%f sum=%f\n", user_id, movie_id, rate, sum  );
-                getchar();
-                rmse += (rate - sum) * (rate - sum);
+            float sum = 0;
+            for (int ii = 0; ii < K; ii++)
+            {
+                sum += (P[user_id][ii] * 10) * (Q[ii][movie_id] * 10);
             }
+            printf("user_id=%d movie_id=%d rate=%f sum=%f\n", user_id, movie_id, rate, sum  );
+            getchar();
+            rmse += (rate - sum) * (rate - sum);
+
 
         }
 
 
-        rmse /= cnt;
+        rmse /= test_cnt;
         rmse = sqrt(rmse);
 
         printf("iter=%d rmse=%lf\n", i, rmse);
