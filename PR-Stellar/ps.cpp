@@ -325,7 +325,7 @@ bool isReady(int worker_id, int required_age, int fd)
         idx_ptr[i] = i;
         score_ptr[i] = pn_vec[i].score / pn_vec[i].to_adj_nodes.size();
     }
-    printf("send to worker %d  pnb entry_num=%d age=%d\n", worker_id, pnb.entry_num, pnb.data_age );
+    //printf("send to worker %d  pnb entry_num=%d age=%d\n", worker_id, pnb.entry_num, pnb.data_age );
     splice_send(fd, buf, data_sz);
     free(buf);
     return true;
@@ -474,10 +474,10 @@ void sendTd(int send_thread_id)
             continue;
         }
         //Stellar does not need this ReqMsg
-        printf("[%d] recving request\n", send_thread_id );
+        //printf("[%d] recving request\n", send_thread_id );
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
 
-        printf("recved request %d  iter =%d\n", msg->worker_id, msg->required_iteration  );
+        //printf("recved request %d  iter =%d\n", msg->worker_id, msg->required_iteration  );
         while (1 == 1)
         {
             if (isReady(msg->worker_id, msg->required_iteration, fd))
@@ -561,7 +561,7 @@ void recvTd(int recv_thread_id)
             }
         }
         submitted_age[recv_thread_id]++;
-        printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
+        //printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
         free(sockBuf);
         free(dataBuf);
 
