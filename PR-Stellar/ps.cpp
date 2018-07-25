@@ -76,6 +76,10 @@ int main(int argc, const char * argv[])
         local_ports[i] = 10000 + i;
         remote_ports[i] = 20000 + i;
     }
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
+        submitted_age[i] = 0;
+    }
     //gen P and Q
     if (argc == 2)
     {
@@ -461,6 +465,7 @@ void sendTd(int send_thread_id)
         //Stellar does not need this ReqMsg
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
 
+        printf("recved request %d  iter =%d\n", msg->worker_id, msg->required_iteration  );
         while (1 == 1)
         {
             if (isReady(msg->worker_id, msg->required_iteration, fd))
@@ -542,6 +547,7 @@ void recvTd(int recv_thread_id)
                 pn_vec[idx].data_age = pb->data_age;
             }
         }
+        submitted_age[recv_thread_id]++;
         free(sockBuf);
         free(dataBuf);
 
