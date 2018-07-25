@@ -57,6 +57,7 @@ mutex qu_mtx;
 std::vector<PageRankNode> pn_vec;
 std::vector<int> depended_ids[100];
 std::vector<int> outside_ids[100];
+std::vector<int> dependedPUs[100];
 
 std::vector<int>to_send_ids[100];
 int send_fds[100];
@@ -125,12 +126,39 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < WORKER_NUM; i++)
     {
+        for (int j = 0; j < WORKER_NUM; j++)
+        {
+            bool i_need_j = false;
+            for (int k = 0; k < depended_ids[i].size(); i++)
+            {
+                if (depended_ids[i][k] >= num_lens[j] && depended_ids[i][k] < num_lens[j + 1] )
+                {
+                    i_need_j = true;
+                    break;
+                }
+            }
+            if (i_need_j)
+            {
+                dependedPUs[i].push_back(j);
+            }
+        }
+    }
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
         printf("%d-%d\n", depended_ids[i].size(), num_lens[i + 1] - num_lens[i]);
     }
 
     for (int i = 0; i < WORKER_NUM; i++)
     {
         printf("TO %d-%d\n", outside_ids[i].size(), num_lens[i + 1] - num_lens[i]);
+    }
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
+        for (int j = 0; j < dependedPUs[i].size(); j++)
+        {
+            printf("%d\t", dependedPUs[i][j]);
+        }
+        printf("\n");
     }
     getchar();
     for (int td = 0; td < WORKER_NUM;  td++)
@@ -440,7 +468,7 @@ void ps_push()
     }
     for (int i = 0; i < WORKER_NUM; i++)
     {
-        pushed_age[i] = 1;
+        pushed_age[i] = 0;
     }
     printf("start ps push\n");
     size_t struct_sz = sizeof(PNBlock);
@@ -459,42 +487,42 @@ void ps_push()
         int idx = -1;
         for (int i = 0; i < WORKER_NUM; i++)
         {
-
-            for (int j = 0; j < depended_ids[i].size(); j++)
+            bool ok = true;
+            for (int j = 0; j < dependedPUs[i].size(); j++)
             {
-                idx = depended_ids[i][j];
-                if (pn_vec[idx].data_age >= pushed_age[i])
+                int dep_pu = dependedPUs[i][j];
+                if (submitted_age[dep_pu] <= pushed_age[i])
                 {
-                    to_send_ids[i].push_back(idx);
+                    ok = false;
                 }
             }
-
-            if (to_send_ids[i].size() > 0)
+            if (ok)
             {
-                idx_sz = sizeof(int) * (to_send_ids[i].size());
-                score_sz = sizeof(float) * (to_send_ids[i].size());
+                idx_sz = sizeof(int) * (depended_ids[i].size());
+                score_sz = sizeof(float) * (depended_ids[i].size());
                 data_sz = idx_sz + score_sz + struct_sz;
                 buf = (char*)malloc(data_sz);
-                PNBlock pnb(to_send_ids[i].size(), pushed_age[i] + 1);
+                PNBlock pnb(depended_ids[i].size(), pushed_age[i] + 1);
                 memcpy(buf, &pnb, struct_sz);
                 if (score_sz > 0)
                 {
                     int* idx_ptr = (int*)(void*)(buf + struct_sz);
                     float* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
-                    for (int ii = 0; ii < to_send_ids[i].size(); ii++)
+                    for (int ii = 0; ii < depended_ids[i].size(); ii++)
                     {
-                        int idx = to_send_ids[i][ii];
+                        int idx = depended_ids[i][ii];
                         idx_ptr[ii] = idx;
                         score_ptr[ii] = pn_vec[idx].score / pn_vec[idx].to_adj_nodes.size();
                     }
                 }
 
-                printf("splice sending.. worker-id=%d sz=%ld\n",  i, to_send_ids[i].size());
+                printf("splice sending.. worker-id=%d sz=%ld\n",  i, depended_ids[i].size());
                 splice_send(send_fds[i], buf, data_sz);
                 free(buf);
                 pushed_age[i]++;
-                to_send_ids[i].clear();
             }
+
+
         }
 
 
