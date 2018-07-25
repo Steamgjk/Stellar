@@ -129,6 +129,7 @@ int main(int argc, const char * argv[])
     {
         printf("%d\t", depended_ids[0][i]);
     }
+    printf("\n");
     for (int i = 0; i < WORKER_NUM; i++)
     {
         for (int j = 0; j < WORKER_NUM; j++)
@@ -136,11 +137,19 @@ int main(int argc, const char * argv[])
             bool i_need_j = false;
             for (int k = 0; k < depended_ids[i].size(); i++)
             {
+                if (j == 1)
+                {
+                    printf("k=%d dp=%d num %d %d\n", k, depended_ids[i][k], num_lens[j], num_lens[j + 1] );
+                    getchar();
+                }
                 if (depended_ids[i][k] >= num_lens[j] && depended_ids[i][k] < num_lens[j + 1] )
                 {
                     i_need_j = true;
+                    printf("TRUEW\n");
                     break;
                 }
+
+
             }
             if (i_need_j)
             {
@@ -159,7 +168,7 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < WORKER_NUM; i++)
     {
-        printf("WOrker %d:\n", i);
+        printf("WOrker %d:", i);
         for (int j = 0; j < dependedPUs[i].size(); j++)
         {
             printf("%d\t", dependedPUs[i][j]);
