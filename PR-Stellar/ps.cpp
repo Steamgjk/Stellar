@@ -493,8 +493,9 @@ void ps_push()
             continue;
         }
         int idx = -1;
-        for (int i = 0; i < WORKER_NUM; i++)
+        for (int wi = 0; wi < 100; wi++)
         {
+            i = wi % 4;
             bool ok = true;
             for (int j = 0; j < dependedPUs[i].size(); j++)
             {
@@ -533,6 +534,45 @@ void ps_push()
             }
 
 
+        }
+        for (int i = 5; i < WORKER_NUM; i++)
+        {
+            bool ok = true;
+            for (int j = 0; j < dependedPUs[i].size(); j++)
+            {
+                int dep_pu = dependedPUs[i][j];
+                if (submitted_age[dep_pu] <= pushed_age[i])
+                {
+                    if (i == 1 || i == 0)
+                        printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
+                    ok = false;
+                }
+            }
+            if (ok)
+            {
+                idx_sz = sizeof(int) * (depended_ids[i].size());
+                score_sz = sizeof(float) * (depended_ids[i].size());
+                data_sz = idx_sz + score_sz + struct_sz;
+                buf = (char*)malloc(data_sz);
+                PNBlock pnb(depended_ids[i].size(), pushed_age[i] + 1);
+                memcpy(buf, &pnb, struct_sz);
+                if (score_sz > 0)
+                {
+                    int* idx_ptr = (int*)(void*)(buf + struct_sz);
+                    float* score_ptr = (float*)(void*)(buf + struct_sz + idx_sz);
+                    for (int ii = 0; ii < depended_ids[i].size(); ii++)
+                    {
+                        int idx = depended_ids[i][ii];
+                        idx_ptr[ii] = idx;
+                        score_ptr[ii] = pn_vec[idx].score / pn_vec[idx].to_adj_nodes.size();
+                    }
+                }
+
+                printf("splice sending.. worker-id=%d sz=%ld\n",  i, depended_ids[i].size());
+                splice_send(send_fds[i], buf, data_sz);
+                free(buf);
+                pushed_age[i]++;
+            }
         }
 
 
