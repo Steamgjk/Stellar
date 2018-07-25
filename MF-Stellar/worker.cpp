@@ -179,11 +179,12 @@ int main(int argc, const char * argv[])
 #endif
             push_block(push_fd, (*Qblock_ptr));
 //#ifdef DEBUG
-            printf("Pushed... iter %d\n", iter_cnt);
+            printf("Pushed... iter11 %d\n", iter_cnt);
 //#endif
 
             if (log_idx <= 30)
             {
+                printf("iter_cnt=%d check_points=%d\n", iter_cnt, check_points[log_idx] );
                 if (iter_cnt == check_points[log_idx++])
                 {
                     WriteLog(*Pblock_ptr, *Qblock_ptr, iter_cnt);
@@ -297,6 +298,7 @@ void LoadData()
 void WriteLog(Block&Pb, Block&Qb, int iter_cnt)
 {
     char fn[100];
+    printf("Writing log  iter=%d\n", iter_cnt );
     sprintf(fn, "./PS-track/Pblock-%d-%d", iter_cnt, Pb.block_id);
     ofstream pofs(fn, ios::trunc);
     for (int h = 0; h < Pb.height; h++)
