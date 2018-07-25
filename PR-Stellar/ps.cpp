@@ -286,6 +286,7 @@ void PeriodicStatistics()
 
     while (1 == 1)
     {
+        /*
         printf("Start to sleep...\n");
         std::this_thread::sleep_for(std::chrono::milliseconds(10000));
         time_units++;
@@ -307,6 +308,7 @@ void PeriodicStatistics()
         printf("time= %d\t iter_t=%d rmse=%f\n", time_units, ter, rmse );
 
         waitfor = false;
+        **/
 
 
     }
