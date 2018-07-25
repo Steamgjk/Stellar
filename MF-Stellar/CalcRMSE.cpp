@@ -68,6 +68,8 @@ void LoadTestRating()
         }
 
     }
+    printf("ele=%d\n", vec_rates.size());
+    getchar();
 }
 
 int main(int argc, const char * argv[])
