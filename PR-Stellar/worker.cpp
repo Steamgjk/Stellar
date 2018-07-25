@@ -527,6 +527,7 @@ void recvTd(int recv_thread_id)
         for (int i = 0; i < pnb->entry_num; i++)
         {
             idx = idx_ptr[i] - num_lens[worker_id];
+            printf("idx=%d  ori=%d  base=%d sz =%d\n", idx, idx_ptr[i], num_lens[worker_id], pn_vec.size() );
             if (pn_vec[idx].data_age < pnb->data_age)
             {
                 pn_vec[idx].previous_score = pn_vec[idx].score;
