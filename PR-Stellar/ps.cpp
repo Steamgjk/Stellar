@@ -559,7 +559,7 @@ void recvTd(int recv_thread_id)
             //printf("cur_len=%d expected_len=%d\n", cur_len, expected_len );
         }
         struct PNBlock* pb = (struct PNBlock*)(void*)sockBuf;
-        if (pnb->entry_num > 0)
+        if (pb->entry_num > 0)
         {
             size_t idx_sz = sizeof(int) * (pb->entry_num);
             size_t score_sz = sizeof(float) * (pb->entry_num);
