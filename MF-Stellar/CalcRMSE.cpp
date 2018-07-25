@@ -142,6 +142,7 @@ int main(int argc, const char * argv[])
         rmse = 0;
         int cnt = 0;
         int ele_num = vec_rates.size();
+        printf("ele_num=%d\n", ele_num );
         int user_id, movie_id;
         float rate;
         for (cnt = 0; cnt < ele_num; cnt++)
