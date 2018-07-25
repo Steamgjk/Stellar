@@ -521,6 +521,8 @@ void recvTd(int recv_thread_id)
         int* idx_ptr = (int*)(void*)dataBuf;
         float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
         int idx = 0;
+        printf("oooooo....\n");
+        printf("pnb %d\n", pnb->entry_num );
         for (int i = 0; i < pnb->entry_num; i++)
         {
             idx -= idx_ptr[i] - num_lens[worker_id];
