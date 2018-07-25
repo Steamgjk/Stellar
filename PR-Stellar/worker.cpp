@@ -141,10 +141,9 @@ int main(int argc, const char * argv[])
             WaitforParas(iter_cnt);
             submf();
             printf("Pushing-A... iter  %d\n", iter_cnt );
-#ifndef STELLAR
+#ifdef STELLAR
             simple_push_block(push_fd);
 #else
-            getchar();
             push_block(push_fd);
 #endif
             printf("Pushed-1... iter %d\n", iter_cnt);
@@ -385,6 +384,7 @@ int push_block(int sendfd)
     return 0;
 }
 
+//??? Problem
 int simple_push_block(int sendfd)
 {
     size_t struct_sz = sizeof(PNBlock);
