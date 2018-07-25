@@ -413,6 +413,7 @@ int simple_push_block(int sendfd)
         memcpy(buf + struct_sz + idx_sz, (char*) & (scores[0]), entry_sz);
     }
 
+    printf("[%d] send sz=%ld\n", worker_id, pn.entry_num );
 
     size_t total_len = struct_sz + data_sz;
     size_t sent_len = 0;
