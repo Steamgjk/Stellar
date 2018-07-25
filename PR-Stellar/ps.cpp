@@ -85,7 +85,7 @@ int main(int argc, const char * argv[])
     {
         WORKER_NUM = atoi(argv[1]) ;
     }
-    float ini_score = 1.0 / PG_NUM;
+    float ini_score = 1000000 / PG_NUM;
     for (int i = 0; i < PG_NUM; i++)
     {
         pn_vec.push_back(PageRankNode(ini_score, 0));
@@ -262,10 +262,6 @@ float CalcRMSE()
     for (int i = 0; i < PG_NUM; i++)
     {
         sum += (pn_vec[i].previous_score - pn_vec[i].score) * (pn_vec[i].previous_score - pn_vec[i].score);
-        if (i <= 100)
-        {
-            printf("%d: %f %f\n", i, pn_vec[i].previous_score, pn_vec[i].score);
-        }
     }
     float rmse = sqrt(sum / (PG_NUM));
     return rmse;

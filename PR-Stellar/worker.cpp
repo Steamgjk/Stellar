@@ -97,8 +97,8 @@ int main(int argc, const char * argv[])
     }
     for (int i = 0; i < num_lens[worker_id + 1] - num_lens[worker_id]; i++ )
     {
-        pn_vec[i].previous_score = 1.0 / PG_NUM;
-        pn_vec[i].score = 1.0 / PG_NUM;
+        pn_vec[i].previous_score = 1000000 / PG_NUM;
+        pn_vec[i].score = 1000000 / PG_NUM;
         pn_vec[i].data_age = 0;
     }
     printf("Init Over\n");
