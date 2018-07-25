@@ -526,14 +526,18 @@ void recvTd(int recv_thread_id)
         getchar();
         for (int i = 0; i < pnb->entry_num; i++)
         {
-            idx = idx_ptr[i] - num_lens[worker_id];
-            printf("idx=%d  ori=%d  base=%d sz =%d\n", idx, idx_ptr[i], num_lens[worker_id], pn_vec.size() );
+            //idx = idx_ptr[i] - num_lens[worker_id];
+            //printf("idx=%d  ori=%d  base=%d sz =%d\n", idx, idx_ptr[i], num_lens[worker_id], pn_vec.size() );
+            /*
             if (pn_vec[idx].data_age < pnb->data_age)
             {
                 pn_vec[idx].previous_score = pn_vec[idx].score;
                 pn_vec[idx].score = score_ptr[i];
                 pn_vec[idx].data_age = pnb->data_age;
             }
+            **/
+            idx = idx_ptr[i];
+            new_scores[idx] = score_ptr[i];
         }
         free(dataBuf);
 
