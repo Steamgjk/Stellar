@@ -50,12 +50,14 @@ using namespace std;
 
 #ifndef TEST_BED
 #define FILE_NAME "/home/shuai/oneword/PRDS/PRData-"
+#define PS_FILE "/home/shuai/oneword/out.trackers"
 #define TEST_NAME "/home/shuai/oneword/validationDS"
 #endif
 
 #ifdef TEST_BED
 #define FILE_NAME "/home/oneword/out.trackers"
 #define TEST_NAME "/home/oneword/validationDS"
+#define PS_FILE "/home/oneword/out.trackers"
 #endif
 //#define STELLAR // ini_rmse 46.2740
 #define BSP_MODE //ini_rmse 46.41

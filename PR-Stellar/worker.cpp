@@ -99,6 +99,7 @@ int main(int argc, const char * argv[])
         pn_vec[i].score = 0;
         pn_vec[i].data_age = 0;
     }
+    printf("Init Over\n");
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
     {
         if (NeededByOutSide(i))
@@ -107,6 +108,7 @@ int main(int argc, const char * argv[])
         }
     }
     iter_cnt = 0;
+    printf("Loading Data\n");
     LoadData();
     printf("Load Rating Success\n");
     {

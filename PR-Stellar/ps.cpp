@@ -169,7 +169,7 @@ int main(int argc, const char * argv[])
 void LoadData()
 {
     int from_node, to_node;
-    ifstream ifs(FILE_NAME);
+    ifstream ifs(PS_FILE);
     if (!ifs.is_open())
     {
         printf("fail-LoadD4 to open %s\n", FILE_NAME );
