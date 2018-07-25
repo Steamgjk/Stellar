@@ -246,9 +246,18 @@ void PeriodicStatistics()
         waitfor = true;
         printf("Entering statistics...\n");
 
+        int ter = 1000000;
+        for (int kk = 0; kk < WORKER_NUM; kk++)
+        {
+            if (submitted_age[kk] < ter)
+            {
+                ter = submitted_age[kk];
+            }
+        }
+
         float rmse = CalcRMSE();
-        ofs << time_units << "\t" << iter_t << "\t" << rmse << endl;
-        printf("time= %d\t iter_t=%d rmse=%f\n", time_units, iter_t, rmse );
+        ofs << time_units << "\t" << ter << "\t" << rmse << endl;
+        printf("time= %d\t iter_t=%d rmse=%f\n", time_units, ter, rmse );
 
         waitfor = false;
 
