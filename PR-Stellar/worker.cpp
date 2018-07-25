@@ -93,7 +93,7 @@ int main(int argc, const char * argv[])
     {
         pn_vec.push_back(PageRankNode());
     }
-    for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
+    for (int i = 0; i < num_lens[worker_id + 1] - num_lens[worker_id]; i++ )
     {
         pn_vec[i].previous_score = 0;
         pn_vec[i].score = 0;
@@ -105,7 +105,6 @@ int main(int argc, const char * argv[])
         {
             outside_vec.push_back(i);
         }
-
     }
     iter_cnt = 0;
     LoadData();
@@ -247,7 +246,7 @@ void CalcUpdt(int td_id)
                     float ret_score = 0;
                     for (size_t j = 0; j < pn_vec[idx].from_adj_nodes.size(); j++)
                     {
-                        int from_node_id = pn_vec[i].from_adj_nodes[j];
+                        int from_node_id = pn_vec[idx].from_adj_nodes[j];
                         ret_score += new_scores[from_node_id];
 
                     }
@@ -261,7 +260,6 @@ void CalcUpdt(int td_id)
 
 void submf()
 {
-
     bool canbreak = true;
 
     for (int ii = 0; ii < WORKER_THREAD_NUM; ii++)
@@ -284,11 +282,13 @@ void submf()
             break;
         }
     }
+    int idx = 0;
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
     {
-        pn_vec[i].previous_score = pn_vec[i].score;
-        pn_vec[i].data_age++;
-        pn_vec[i].score = new_scores[i];
+        idx = i - num_lens[worker_id + 1] - num_lens[worker_id];
+        pn_vec[idx].previous_score = pn_vec[idx].score;
+        pn_vec[idx].data_age++;
+        pn_vec[idx].score = new_scores[idx];
     }
 }
 
@@ -339,10 +339,12 @@ int push_block(int sendfd)
 
     std::vector<int> idxes;
     std::vector<float> scores;
+    int idx = 0;
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
     {
         idxes.push_back(i);
-        scores.push_back(pn_vec[i].score);
+        idx = i - num_lens[worker_id];
+        scores.push_back(pn_vec[idx].score);
     }
     char* buf = (char*)malloc(struct_sz + data_sz);
     memcpy(buf, &(pn), struct_sz);
@@ -389,7 +391,7 @@ int simple_push_block(int sendfd)
     std::vector<float> scores;
     for (size_t i = 0; i < outside_vec.size(); i++)
     {
-        int idx = outside_vec[i];
+        int idx = outside_vec[i] - num_lens[worker_id];
         scores.push_back(pn_vec[idx].score);
     }
     char* buf = (char*)malloc(struct_sz + data_sz);
@@ -508,13 +510,15 @@ void recvTd(int recv_thread_id)
         }
         int* idx_ptr = (int*)(void*)dataBuf;
         float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
+        int idx = 0;
         for (int i = 0; i < pnb->entry_num; i++)
         {
-            if (pn_vec[idx_ptr[i]].data_age < pnb->data_age)
+            idx -= idx_ptr[i] - num_lens[worker_id];
+            if (pn_vec[idx].data_age < pnb->data_age)
             {
-                pn_vec[idx_ptr[i]].previous_score = pn_vec[idx_ptr[i]].score;
-                pn_vec[idx_ptr[i]].score = score_ptr[i];
-                pn_vec[idx_ptr[i]].data_age = pnb->data_age;
+                pn_vec[idx].previous_score = pn_vec[idx].score;
+                pn_vec[idx].score = score_ptr[i];
+                pn_vec[idx].data_age = pnb->data_age;
             }
         }
         free(dataBuf);
