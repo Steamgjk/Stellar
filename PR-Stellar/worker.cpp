@@ -195,7 +195,7 @@ void LoadData()
     ifstream ifs(fn);
     if (!ifs.is_open())
     {
-        printf("fail-LoadD4 to open %s\n", FILE_NAME );
+        printf("fail-LoadD4 to open %s\n", fn );
         exit(-1);
     }
 //the first line is text
