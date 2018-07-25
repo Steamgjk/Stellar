@@ -55,7 +55,7 @@ using namespace std;
 #endif
 
 #ifdef TEST_BED
-#define FILE_NAME "/home/oneword/out.trackers"
+#define FILE_NAME "/home/oneword/PRDS/PRData-"
 #define TEST_NAME "/home/oneword/validationDS"
 #define PS_FILE "/home/oneword/out.trackers"
 #endif
