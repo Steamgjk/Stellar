@@ -464,6 +464,7 @@ void sendTd(int send_thread_id)
     int fd = genActivePushfd(send_thread_id);
     ReqMsg* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
     int ret = -1;
+    printf("send  waitfor=%d\n", waitfor );
     while (1 == 1)
     {
         if (waitfor)
@@ -496,7 +497,7 @@ void sendTd(int send_thread_id)
 
 void recvTd(int recv_thread_id)
 {
-    printf("recv_thread_id=%d\n", recv_thread_id);
+    printf("recv_thread_id-11=%d\n", recv_thread_id);
     int connfd = wait4connection(local_ips[recv_thread_id], local_ports[recv_thread_id] );
     recvConnected[recv_thread_id] = true;
 
@@ -507,6 +508,7 @@ void recvTd(int recv_thread_id)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
+        printf("[%d]recving\n", recv_thread_id);
         size_t expected_len = sizeof(PNBlock);
         char* sockBuf = (char*)malloc(expected_len);
         size_t cur_len = 0;
@@ -558,6 +560,7 @@ void recvTd(int recv_thread_id)
             }
         }
         submitted_age[recv_thread_id]++;
+        printf("[%d]recved data\n", recv_thread_id);
         free(sockBuf);
         free(dataBuf);
 
@@ -599,7 +602,7 @@ int wait4connection(char*local_ip, int local_port)
     socklen_t clientLen = sizeof(addressClient);
     //接受连接，阻塞函数
     int connfd = accept(fd, (struct sockaddr*)&addressClient, &clientLen);
-    printf("get connection from %s  %d\n", inet_ntoa(addressClient.sin_addr), addressClient.sin_port);
+    printf("get connection-11 from %s  %d\n", inet_ntoa(addressClient.sin_addr), addressClient.sin_port);
     return connfd;
 
 }
