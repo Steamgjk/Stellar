@@ -241,6 +241,7 @@ void CalcUpdt(int td_id)
     {
         if (StartCalcUpdt[td_id] == true)
         {
+            printf("[%d]new_scores.sz=%ld\n", td_id, new_scores.size() );
             for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
             {
                 if (i % WORKER_THREAD_NUM == td_id)
@@ -256,6 +257,7 @@ void CalcUpdt(int td_id)
                     new_scores[i] = 0.85 * ret_score + 0.15 * (pn_vec[idx].score);
                 }
             }
+            printf("[%d]Calc Ok\n", td_id);
             StartCalcUpdt[td_id] = false;
         }
     }
@@ -286,6 +288,7 @@ void submf()
         }
     }
     int idx = 0;
+    printf("Updating....\n");
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
     {
         idx = i - num_lens[worker_id];
