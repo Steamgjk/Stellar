@@ -262,6 +262,10 @@ float CalcRMSE()
     for (int i = 0; i < PG_NUM; i++)
     {
         sum += (pn_vec[i].previous_score - pn_vec[i].score) * (pn_vec[i].previous_score - pn_vec[i].score);
+        if (i <= 100)
+        {
+            printf("%d: %f %f\n", i, pn_vec[i].previous_score, pn_vec[i].score);
+        }
     }
     float rmse = sqrt(sum / (PG_NUM));
     return rmse;
