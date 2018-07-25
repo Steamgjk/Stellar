@@ -124,13 +124,7 @@ int main(int argc, const char * argv[])
 
         }
     }
-    printf("sampling\n");
-    for (int i = 0; i < 20; i++)
-    {
-        printf("%d\t", depended_ids[0][i]);
-    }
-    printf("\n");
-    printf("depden 00 =%d\n", depended_ids[0][0] );
+
     for (int i = 0; i < WORKER_NUM; i++)
     {
         for (int j = 0; j < WORKER_NUM; j++)
@@ -138,17 +132,11 @@ int main(int argc, const char * argv[])
             bool i_need_j = false;
             for (int k = 0; k < depended_ids[i].size(); k++)
             {
-                /*
-                if (j == 0)
-                {
-                    printf("i=%d k=%d dp=%d num %d %d  dp00=%d\n", i, k, depended_ids[i][k], num_lens[j], num_lens[j + 1], depended_ids[0][0] );
-                    getchar();
-                }
-                **/
+
                 if (depended_ids[i][k] >= num_lens[j] && depended_ids[i][k] < num_lens[j + 1] )
                 {
                     i_need_j = true;
-                    printf("TRUEW i=%d  j=%d\n", i, j);
+
                     break;
                 }
 
@@ -511,6 +499,7 @@ void ps_push()
                 int dep_pu = dependedPUs[i][j];
                 if (submitted_age[dep_pu] <= pushed_age[i])
                 {
+                    printf("depu=%d sage=%d page=%d\n", dep_pu, submitted_age[dep_pu], pushed_age[i]  );
                     ok = false;
                 }
             }
@@ -651,7 +640,7 @@ void recvTd(int recv_thread_id)
                 }
             }
             submitted_age[recv_thread_id]++;
-            //printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
+            printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
             free(dataBuf);
         }
 
