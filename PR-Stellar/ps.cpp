@@ -140,7 +140,7 @@ int main(int argc, const char * argv[])
             {
                 if (j == 1)
                 {
-                    printf("k=%d dp=%d num %d %d  dp00=%d\n", k, depended_ids[i][k], num_lens[j], num_lens[j + 1], depended_ids[0][0] );
+                    printf("i=%d k=%d dp=%d num %d %d  dp00=%d\n", i, k, depended_ids[i][k], num_lens[j], num_lens[j + 1], depended_ids[0][0] );
                     getchar();
                 }
                 if (depended_ids[i][k] >= num_lens[j] && depended_ids[i][k] < num_lens[j + 1] )
