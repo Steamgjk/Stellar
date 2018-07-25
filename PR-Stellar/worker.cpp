@@ -288,7 +288,7 @@ void submf()
     int idx = 0;
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
     {
-        idx = i - num_lens[worker_id + 1] - num_lens[worker_id];
+        idx = i - num_lens[worker_id];
         pn_vec[idx].previous_score = pn_vec[idx].score;
         pn_vec[idx].data_age++;
         pn_vec[idx].score = new_scores[idx];
