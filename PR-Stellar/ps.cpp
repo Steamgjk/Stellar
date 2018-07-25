@@ -281,7 +281,7 @@ bool curIterFin(int curIter)
     return true;
 }
 
-bool isReady(int worker_id, int required_iter, int fd)
+bool isReady(int worker_id, int required_age, int fd)
 {
     size_t struct_sz = sizeof(PNBlock);
     size_t data_sz = 0;
@@ -289,7 +289,7 @@ bool isReady(int worker_id, int required_iter, int fd)
 
     //for BSP constraints
 #ifdef BSP_MODE
-    if (!curIterFin(required_iter - 1))
+    if (!curIterFin(required_age))
     {
         /*
         printf("%d iter cannot send to worker %d\n", required_iter, worker_id );
@@ -302,20 +302,16 @@ bool isReady(int worker_id, int required_iter, int fd)
         return false;
     }
 
-    if (iter_t < required_iter)
-    {
-        return false;
-    }
 #endif
 
 #ifdef SSP_MODE
-    if (iter_t < required_iter - SSP_BOUND)
+    if (!curIterFin(required_age - SSP_BOUND) )
     {
         return false;
     }
 #endif
 
-    PNBlock pnb(PG_NUM, iter_t);
+    PNBlock pnb(PG_NUM, required_age);
     size_t idx_sz = sizeof(int) * PG_NUM;
     size_t score_sz  = sizeof(int) * PG_NUM;
     data_sz = struct_sz + idx_sz + score_sz;
