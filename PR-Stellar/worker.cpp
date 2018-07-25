@@ -540,6 +540,11 @@ void recvTd(int recv_thread_id)
             **/
             idx = idx_ptr[i];
             new_scores[idx] = score_ptr[i];
+            if (new_scores[idx] > 1)
+            {
+                printf("idx=%d i=%d score=%f\n", idx, i, new_scores[idx] );
+                getchar();
+            }
         }
         free(dataBuf);
 

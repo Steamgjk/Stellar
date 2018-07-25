@@ -327,7 +327,16 @@ bool isReady(int worker_id, int required_age, int fd)
     for (int i = 0; i < PG_NUM; i++)
     {
         idx_ptr[i] = i;
-        score_ptr[i] = pn_vec[i].score / pn_vec[i].to_adj_nodes.size();
+        if (pn_vec[i].to_adj_nodes.size() > 0)
+        {
+            score_ptr[i] = pn_vec[i].score / pn_vec[i].to_adj_nodes.size();
+        }
+        else
+        {
+            score_ptr[i] = 0.0;
+        }
+
+
     }
     //printf("send to worker %d  pnb entry_num=%d age=%d\n", worker_id, pnb.entry_num, pnb.data_age );
     splice_send(fd, buf, data_sz);
