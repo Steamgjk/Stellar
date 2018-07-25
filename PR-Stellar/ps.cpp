@@ -495,7 +495,7 @@ void ps_push()
         int idx = -1;
         for (int wi = 0; wi < 100; wi++)
         {
-            i = wi % 4;
+            int i = wi % 4;
             bool ok = true;
             for (int j = 0; j < dependedPUs[i].size(); j++)
             {
