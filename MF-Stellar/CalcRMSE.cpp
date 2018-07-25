@@ -142,6 +142,8 @@ int main(int argc, const char * argv[])
         rmse = 0;
         int cnt = 0;
         int ele_num = vec_rates.size();
+        int user_id, movie_id;
+        float rate;
         for (cnt = 0; cnt < ele_num; cnt++)
         {
             user_id = vec_uids[cnt];
