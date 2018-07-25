@@ -140,6 +140,7 @@ int main(int argc, const char * argv[])
         send_thread.detach();
     }
 #endif
+
 #ifdef STELLAR
     for (int send_thread_id = 0; send_thread_id < WORKER_NUM; send_thread_id++)
     {
@@ -152,9 +153,11 @@ int main(int argc, const char * argv[])
         std::thread send_thread(genActivePushfd, thid);
         send_thread.detach();
     }
+
     std::thread ps_push_td(ps_push);
     ps_push_td.detach();
-
+    std::thread periodic_td(PeriodicStatistics);
+    periodic_td.detach();
 #endif
     iter_t = 0;
     while (1 == 1)
