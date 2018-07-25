@@ -561,7 +561,7 @@ void recvTd(int recv_thread_id)
             }
         }
         submitted_age[recv_thread_id]++;
-        //printf("[%d]recved data\n", recv_thread_id);
+        printf("[%d]recved data\n", recv_thread_id);
         free(sockBuf);
         free(dataBuf);
 
