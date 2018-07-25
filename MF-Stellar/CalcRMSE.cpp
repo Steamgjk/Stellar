@@ -147,8 +147,6 @@ int main(int argc, const char * argv[])
         float rate;
 
         ifstream ifs(TEST_NAME, ios::in | ios::out);
-        int user_id, movie_id;
-        float rate;
         int test_cnt = 0;
         while (!ifs.eof())
         {
