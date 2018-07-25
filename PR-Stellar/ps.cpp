@@ -56,6 +56,7 @@ mutex qu_mtx;
 
 std::vector<PageRankNode> pn_vec;
 std::vector<int> depended_ids[100];
+std::vector<int> outside_ids[100];
 
 std::vector<int>to_send_ids[100];
 int send_fds[100];
@@ -112,6 +113,13 @@ int main(int argc, const char * argv[])
                 }
 
             }
+            for (int k = 0; k < pn_vec[j].to_adj_nodes.size(); k++)
+            {
+                if (pn_vec[j].to_adj_nodes[k] < num_lens[i] || pn_vec[j].to_nodes[k] >= num_lens[i + 1])
+                {
+                    outside_ids[i].push_back(pn_vec[j].to_adj_nodes[k]);
+                }
+            }
 
         }
     }
@@ -120,6 +128,11 @@ int main(int argc, const char * argv[])
         printf("%d-%d\n", depended_ids[i].size(), num_lens[i + 1] - num_lens[i]);
     }
 
+    for (int i = 0; i < WORKER_NUM; i++)
+    {
+        printf("TO %d-%d\n", outside_ids[i].size(), num_lens[i + 1] - num_lens[i]);
+    }
+    getchar();
     for (int td = 0; td < WORKER_NUM;  td++)
     {
         recvConnected[td] = false;

@@ -102,6 +102,12 @@ int main(int argc, const char * argv[])
         pn_vec[i].data_age = 0;
     }
     printf("Init Over\n");
+
+    iter_cnt = 0;
+    printf("Loading Data\n");
+    LoadData();
+    printf("Load Rating Success\n");
+
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
     {
         if (NeededByOutSide(i))
@@ -109,10 +115,6 @@ int main(int argc, const char * argv[])
             outside_vec.push_back(i);
         }
     }
-    iter_cnt = 0;
-    printf("Loading Data\n");
-    LoadData();
-    printf("Load Rating Success\n");
     {
         printf("recv th_id=%d\n", thread_id );
         std::thread recv_thread(recvTd, thread_id);
