@@ -463,6 +463,7 @@ void sendTd(int send_thread_id)
             continue;
         }
         //Stellar does not need this ReqMsg
+        printf("[%d] recving request\n", recv_thread_id );
         ret = recv(fd, msg, sizeof(ReqMsg), 0);
 
         printf("recved request %d  iter =%d\n", msg->worker_id, msg->required_iteration  );
