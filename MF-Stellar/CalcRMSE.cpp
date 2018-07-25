@@ -26,6 +26,10 @@
 #define FILE_NAME "./yahoo-output/train-"
 #define TEST_NAME "/home/shuai/oneword/validationDS"
 
+#define N 1000990
+#define M 624961
+#define K  100 //主题个数
+
 
 int ITER_NUM  = 2000;
 int PORTION_NUM = 4;
