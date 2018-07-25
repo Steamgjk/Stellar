@@ -465,7 +465,7 @@ void sendTd(int send_thread_id)
     int fd = genActivePushfd(send_thread_id);
     ReqMsg* msg = (ReqMsg*)malloc(sizeof(ReqMsg));
     int ret = -1;
-    printf("send  waitfor=%d\n", waitfor );
+
     while (1 == 1)
     {
         if (waitfor)
@@ -509,7 +509,7 @@ void recvTd(int recv_thread_id)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        printf("[%d]recving\n", recv_thread_id);
+        //printf("[%d]recving\n", recv_thread_id);
         size_t expected_len = sizeof(PNBlock);
         char* sockBuf = (char*)malloc(expected_len);
         size_t cur_len = 0;
@@ -520,7 +520,7 @@ void recvTd(int recv_thread_id)
             ret = recv(connfd, sockBuf + cur_len, expected_len - cur_len, 0);
             if (ret <=  0)
             {
-                printf("[%d] Mimatch! %d\n", recv_thread_id, ret);
+                printf("[%d] Mimatch!  cur_len=%d  expected_len=%d ret=%d errno=%d\n", recv_thread_id, cur_len, expected_len, ret, errno);
                 if (ret == 0)
                 {
                     exit(-1);
@@ -561,7 +561,7 @@ void recvTd(int recv_thread_id)
             }
         }
         submitted_age[recv_thread_id]++;
-        printf("[%d]recved data\n", recv_thread_id);
+        //printf("[%d]recved data\n", recv_thread_id);
         free(sockBuf);
         free(dataBuf);
 
