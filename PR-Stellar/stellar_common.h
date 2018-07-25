@@ -46,7 +46,7 @@ using namespace std;
 
 #define LOG_FILE "./rmse_log"
 
-//#define TEST_BED
+#define TEST_BED
 
 #ifndef TEST_BED
 #define FILE_NAME "/home/shuai/oneword/PRDS/PRData-"

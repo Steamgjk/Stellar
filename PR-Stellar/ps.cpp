@@ -501,8 +501,7 @@ void ps_push()
                 int dep_pu = dependedPUs[i][j];
                 if (submitted_age[dep_pu] <= pushed_age[i])
                 {
-
-                    printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
+                    //printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
                     ok = false;
                 }
             }
@@ -526,7 +525,7 @@ void ps_push()
                     }
                 }
 
-                printf("splice sending.. worker-id=%d sz=%ld\n",  i, depended_ids[i].size());
+                //printf("splice sending.. worker-id=%d sz=%ld\n",  i, depended_ids[i].size());
                 splice_send(send_fds[i], buf, data_sz);
                 free(buf);
                 pushed_age[i]++;
