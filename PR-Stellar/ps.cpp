@@ -136,13 +136,15 @@ int main(int argc, const char * argv[])
         for (int j = 0; j < WORKER_NUM; j++)
         {
             bool i_need_j = false;
-            for (int k = 0; k < depended_ids[i].size(); i++)
+            for (int k = 0; k < depended_ids[i].size(); k++)
             {
+                /*
                 if (j == 0)
                 {
                     printf("i=%d k=%d dp=%d num %d %d  dp00=%d\n", i, k, depended_ids[i][k], num_lens[j], num_lens[j + 1], depended_ids[0][0] );
                     getchar();
                 }
+                **/
                 if (depended_ids[i][k] >= num_lens[j] && depended_ids[i][k] < num_lens[j + 1] )
                 {
                     i_need_j = true;
