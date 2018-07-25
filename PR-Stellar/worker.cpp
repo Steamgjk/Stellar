@@ -360,6 +360,7 @@ int push_block(int sendfd)
     int ret = -1;
     size_t to_send_len = 4096;
     //gettimeofday(&st, 0);
+    printf("will send\n");
     while (remain_len > 0)
     {
         if (to_send_len > remain_len)
@@ -380,6 +381,7 @@ int push_block(int sendfd)
         }
         //getchar();
     }
+    printf("fini send\n");
     free(buf);
     return 0;
 }
