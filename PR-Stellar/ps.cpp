@@ -85,7 +85,7 @@ int main(int argc, const char * argv[])
     {
         WORKER_NUM = atoi(argv[1]) ;
     }
-    float ini_score = 1000000 / PG_NUM;
+    float ini_score = 100000000.0 / PG_NUM;
     for (int i = 0; i < PG_NUM; i++)
     {
         pn_vec.push_back(PageRankNode(ini_score, 0));
