@@ -80,7 +80,7 @@ int main(int argc, const char * argv[])
     ifstream ifs;
     double rmse = 0;
 
-    LoadTestRating();
+    //LoadTestRating();
     char filename[100];
     //int i = 0;
     //int i = atoi(argv[3]);
@@ -143,25 +143,42 @@ int main(int argc, const char * argv[])
 
         rmse = 0;
         int cnt = 0;
-        int ele_num = vec_rates.size();
-        printf("ele_num=%d\n", ele_num );
         int user_id, movie_id;
         float rate;
-        for (cnt = 0; cnt < ele_num; cnt++)
-        {
-            user_id = vec_uids[cnt];
-            movie_id = vec_mids[cnt];
-            rate = vec_rates[cnt];
 
-            float sum = 0;
-            for (int ii = 0; ii < K; ii++)
+        ifstream ifs(TEST_NAME, ios::in | ios::out);
+        int user_id, movie_id;
+        float rate;
+        int test_cnt = 0;
+        while (!ifs.eof())
+        {
+            ifs >> user_id >> movie_id >> rate;
+
+
+            test_cnt++;
+            if (test_cnt % 10000 == 0)
             {
-                sum += (P[user_id][ii] * 10) * (Q[ii][movie_id] * 10);
+                printf("test_cnt=%d\n",  test_cnt);
             }
-            printf("user_id=%d movie_id=%d rate=%f sum=%f\n", user_id, movie_id, rate, sum  );
-            getchar();
-            rmse += (rate - sum) * (rate - sum);
+            for (cnt = 0; cnt < ele_num; cnt++)
+            {
+                user_id = vec_uids[cnt];
+                movie_id = vec_mids[cnt];
+                rate = vec_rates[cnt];
+
+                float sum = 0;
+                for (int ii = 0; ii < K; ii++)
+                {
+                    sum += (P[user_id][ii] * 10) * (Q[ii][movie_id] * 10);
+                }
+                printf("user_id=%d movie_id=%d rate=%f sum=%f\n", user_id, movie_id, rate, sum  );
+                getchar();
+                rmse += (rate - sum) * (rate - sum);
+            }
+
         }
+
+
         rmse /= cnt;
         rmse = sqrt(rmse);
 
