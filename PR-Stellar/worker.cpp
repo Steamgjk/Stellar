@@ -546,6 +546,7 @@ void recvTd(int recv_thread_id)
         recved_data_age++;
 
         to_recv_age++;
+        printf("[%d]recved data_age=%d  to_recv_age=%d\n", recv_thread_id, recved_data_age, to_recv_age);
     }
 }
 
