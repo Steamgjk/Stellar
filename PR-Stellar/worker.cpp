@@ -43,6 +43,7 @@ bool StartCalcUpdt[100];
 
 std::vector<int> outside_vec;
 std::vector<float> new_scores;
+std::vector<float> tmp_scores;
 std::vector<PageRankNode> pn_vec;
 int iter_cnt = 0;
 int worker_id = 0;
@@ -92,6 +93,7 @@ int main(int argc, const char * argv[])
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++ )
     {
         pn_vec.push_back(PageRankNode());
+        tmp_scores.push_back(0);
     }
     for (int i = 0; i < num_lens[worker_id + 1] - num_lens[worker_id]; i++ )
     {
@@ -254,7 +256,7 @@ void CalcUpdt(int td_id)
                         ret_score += new_scores[from_node_id];
 
                     }
-                    new_scores[i] = 0.85 * ret_score + 0.15 * (pn_vec[idx].score);
+                    tmp_scores[idx] = 0.85 * ret_score + 0.15 * (pn_vec[idx].score);
                 }
             }
             printf("[%d]Calc Ok\n", td_id);
@@ -294,7 +296,7 @@ void submf()
         idx = i - num_lens[worker_id];
         pn_vec[idx].previous_score = pn_vec[idx].score;
         pn_vec[idx].data_age++;
-        pn_vec[idx].score = new_scores[idx];
+        pn_vec[idx].score = tmp_scores[idx];
     }
 }
 
