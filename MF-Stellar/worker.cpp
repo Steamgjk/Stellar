@@ -185,9 +185,10 @@ int main(int argc, const char * argv[])
             if (log_idx <= 30)
             {
                 printf("iter_cnt=%d check_points=%d\n", iter_cnt, check_points[log_idx] );
-                if (iter_cnt == check_points[log_idx++])
+                if (iter_cnt == check_points[log_idx])
                 {
                     WriteLog(*Pblock_ptr, *Qblock_ptr, iter_cnt);
+                    log_idx++;
                 }
             }
             iter_cnt++;
