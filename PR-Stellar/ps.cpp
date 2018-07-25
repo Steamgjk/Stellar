@@ -499,7 +499,8 @@ void ps_push()
                 int dep_pu = dependedPUs[i][j];
                 if (submitted_age[dep_pu] <= pushed_age[i])
                 {
-                    printf("depu=%d sage=%d page=%d\n", dep_pu, submitted_age[dep_pu], pushed_age[i]  );
+                    if (i == 1 || i == 0)
+                        printf("i=%d depu=%d sage=%d page=%d\n", i, dep_pu, submitted_age[dep_pu], pushed_age[i]  );
                     ok = false;
                 }
             }
@@ -640,7 +641,8 @@ void recvTd(int recv_thread_id)
                 }
             }
             submitted_age[recv_thread_id]++;
-            printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
+            if (recv_thread_id == 0 || recv_thread_id == 1)
+                printf("[%d]recved data  submitted_age=%d p-age=%d\n", recv_thread_id, submitted_age[recv_thread_id], pb->data_age);
             free(dataBuf);
         }
 
