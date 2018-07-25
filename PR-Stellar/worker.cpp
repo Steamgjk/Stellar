@@ -534,7 +534,7 @@ void recvTd(int recv_thread_id)
             float* score_ptr = (float*)(void*)(dataBuf + idx_sz);
             int idx = 0;
 
-            printf("[%d]pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
+            printf("[%d]recved pnb %d  age=%d\n", recv_thread_id, pnb->entry_num, pnb->data_age );
             //getchar();
             for (int i = 0; i < pnb->entry_num; i++)
             {
