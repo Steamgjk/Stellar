@@ -292,7 +292,7 @@ bool isReady(int worker_id, int required_age, int fd)
     if (!curIterFin(required_age))
     {
 
-        printf("%d iter cannot send to worker %d\n", required_iter, worker_id );
+        printf("%d iter cannot send to worker %d\n", required_age, worker_id );
         for (int ll = 0; ll < WORKER_NUM; ll++)
         {
             printf("%d\t", submitted_age[ll]);
