@@ -66,8 +66,8 @@ using namespace std;
 #define SSP_MODE
 //#define SSP_BOUND (0) //ini_rmse  46.414
 //#define SSP_BOUND (10000) //ini_rmse  46.414
-#define SSP_BOUND (1) //ini_rmse  46.383
-//#define SSP_BOUND (2) //ini_rmse 46.414349
+//#define SSP_BOUND (1) //ini_rmse  46.383
+#define SSP_BOUND (2) //ini_rmse 46.414349
 //#define SSP_BOUND (3) //ini_rmse 46.40423
 struct Block
 {
