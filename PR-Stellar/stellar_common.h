@@ -63,8 +63,8 @@ using namespace std;
 
 //#define STELLAR // ini_rmse 46.2740
 //#define BSP_MODE //ini_rmse 46.41
-//#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
-#define SSP_MODE
+#define ASP_MODE //ini_rmse 46.4143   120-110  200-230
+//#define SSP_MODE
 //#define SSP_BOUND (0) //ini_rmse  46.414
 //#define SSP_BOUND (10000) //ini_rmse  46.414
 //#define SSP_BOUND (1) //ini_rmse  46.383
