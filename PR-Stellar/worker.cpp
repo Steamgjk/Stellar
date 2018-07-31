@@ -52,8 +52,10 @@ int worker_id = 0;
 int pull_fd, push_fd;
 int recved_data_age;
 
+int log_points[100] = {3, 5, 8, 11, 14, 17, 19, 22, 25, 28, 31, 34, 36, 39, 42, 45, 47, 49, 51, 53, 55, 58, 61, 63, 66, 69, 72, 75, 77, 80, 83};
 int main(int argc, const char * argv[])
 {
+
 #ifndef TEST_BED
     char* lip  = "127.0.0.1";
     for (int i = 0; i < CAP; i++)
@@ -78,6 +80,12 @@ int main(int argc, const char * argv[])
         WORKER_NUM = atoi(argv[2]);
     }
 
+
+    char worker_log[100];
+    sprintf(worker_log, "%s-%d", "WorkerLog", worker_id);
+    ofstream ofs(worker_log, ios::trunc);
+    int log_idx = 0;
+    printf("Log File Established\n");
     int block_units = PG_NUM / WORKER_NUM;
     for (int i = 0; i < WORKER_NUM; i++)
     {
@@ -148,7 +156,7 @@ int main(int argc, const char * argv[])
             printf("waiting for Paras iter_cnt=%d\n", iter_cnt);
             WaitforParas(iter_cnt);
             submf();
-            printf("Pushing-A... iter  %d\n", iter_cnt );
+            //printf("Pushing-A... iter  %d\n", iter_cnt );
 #ifdef STELLAR
             simple_push_block(push_fd);
 #else
@@ -156,6 +164,18 @@ int main(int argc, const char * argv[])
 #endif
             printf("Pushed-1... iter %d\n", iter_cnt);
             iter_cnt++;
+            float err = 0;
+            for (int kk = num_lens[worker_id]; kk < num_lens[worker_id + 1]; kk++)
+            {
+                int real_idx = num_lens[worker_id + 1] - num_lens[worker_id];
+                err += (pn_vec[real_idx].previous_score - pn_vev[real_idx].score) * (pn_vec[real_idx].previous_score - pn_vev[real_idx].score);
+            }
+            if (iter_cnt == log_points[log_idx])
+            {
+                ofs << log_points[log_idx] << "\t" << err << endl;
+                printf("Log: %d\t%f\n", log_points[log_idx], err);
+                log_idx++;
+            }
         }
     }
 
