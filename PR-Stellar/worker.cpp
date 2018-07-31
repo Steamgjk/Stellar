@@ -181,7 +181,7 @@ int main(int argc, const char * argv[])
             }
             **/
             gettimeofday(&start, 0);
-            long long ts = (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+            long long ts = (long long)start.tv_sec * 1000 + start.tv_usec / 1000;
             printf("%lld\n", ts );
             ofs << ts << endl;
         }
