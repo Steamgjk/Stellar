@@ -167,7 +167,7 @@ int main(int argc, const char * argv[])
             float err = 0;
             for (int kk = num_lens[worker_id]; kk < num_lens[worker_id + 1]; kk++)
             {
-                int real_idx = num_lens[worker_id + 1] - num_lens[worker_id];
+                int real_idx = kk - num_lens[worker_id];
                 err += (pn_vec[real_idx].previous_score - pn_vec[real_idx].score) * (pn_vec[real_idx].previous_score - pn_vec[real_idx].score);
             }
             if (iter_cnt == log_points[log_idx])
