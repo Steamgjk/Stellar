@@ -306,8 +306,17 @@ void PeriodicStatistics()
         }
 
         float rmse = CalcRMSE();
-        ofs << time_units << "\t" << ter << "\t" << rmse << endl;
+        //ofs << time_units << "\t" << ter << "\t" << rmse << endl;
         printf("time= %d\t iter_t=%d rmse=%f\n", time_units, ter, rmse );
+
+        printf("Iter:\t");
+        for (int kk = 0; kk < WORKER_NUM; kk++)
+        {
+            ofs << submitted_age[kk] << "\t";
+            printf("%d\t", submitted_age[kk]);
+        }
+        ofs << endl;
+        printf("\n");
 
         waitfor = false;
 
