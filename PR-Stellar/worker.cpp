@@ -166,6 +166,7 @@ int main(int argc, const char * argv[])
 #endif
             printf("Pushed-1... iter %d\n", iter_cnt);
             iter_cnt++;
+            /*
             float err = 0;
             for (int kk = num_lens[worker_id]; kk < num_lens[worker_id + 1]; kk++)
             {
@@ -178,6 +179,11 @@ int main(int argc, const char * argv[])
                 printf("Log: %d\t%f\n", log_points[log_idx], err);
                 log_idx++;
             }
+            **/
+            gettimeofday(&start, 0);
+            long long ts = (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+            printf("%lld\n", ts );
+            ofs << ts << endl;
         }
     }
 
