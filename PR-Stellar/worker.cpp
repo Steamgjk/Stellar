@@ -316,14 +316,17 @@ void submf()
         }
     }
     int idx = 0;
-    printf("Updating....\n");
+    float rr = 0;
+
     for (int i = num_lens[worker_id]; i < num_lens[worker_id + 1]; i++)
     {
         idx = i - num_lens[worker_id];
         pn_vec[idx].previous_score = pn_vec[idx].score;
         pn_vec[idx].data_age++;
         pn_vec[idx].score = tmp_scores[idx];
+        rr += (pn_vec[idx].previous_score - pn_vec[idx].score) * (pn_vec[idx].previous_score - pn_vec[idx].score);
     }
+    printf("Updated.... iter_cn=%d rr=%f\n", iter_cnt, rr);
 }
 
 
